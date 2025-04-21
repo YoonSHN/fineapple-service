@@ -1,0 +1,169 @@
+<div th:fragment="userList" data-page="userlist" xmlns:sec="http://www.w3.org/1999/xhtml">
+    <main class="main-content">
+        <header class="main-header">
+            <h1>고객 목록</h1>
+            <div class="header-actions">
+                <!-- 알림 -->
+                <details class="notif-menu">
+                    <summary class="notif-btn">
+                        <span class="material-symbols-outlined">notifications</span>
+                        <span class="notif-dot"></span>
+                    </summary>
+                    <div class="notif-dropdown">
+                        <div class="notif-item">새 주문이 들어왔습니다.</div>
+                        <div class="notif-item">상품 재고가 부족합니다.</div>
+                        <div class="notif-item">결제가 완료되었습니다.</div>
+                    </div>
+                </details>
+                <!-- 사용자 메뉴 -->
+                <div class="user-menu">
+                    <details class="user-menu__details">
+                        <summary class="user-menu__summary">
+                            <div class="user-menu__avatar"
+                                 th:if="${#authorization.expression('isAuthenticated()')}"
+                                 th:text="${#strings.substring(#authentication.name, 0, 1)}">
+                                JD
+                            </div>
+                            <span class="user-menu__name" th:if="${#authorization.expression('isAuthenticated()')}"
+                                  th:text="${#strings.substringBefore(#authentication.name, '@')}">John Doe</span>
+                        </summary>
+                        <div class="user-menu__dropdown">
+                            <a href="#" class="user-menu__item">My Profile</a>
+                            <a href="#" class="user-menu__item">Settings</a>
+                            <div class="user-menu__divider"></div>
+                            <a href="#" class="user-menu__item" id="logout-link">Logout</a>
+                            <form id="logout-form" th:action="@{/logout}" method="post">
+                                <button type="submit" class="custom-button">Logout</button>
+                            </form>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </header>
+
+        <header class="search-header">
+            <div class="header-actions">
+                <div class="search-box" style="display: flex; align-items: center; gap: 0.5rem;">
+                    <select name="isActive" style="width: 80px;">
+                        <option value="">전체</option>
+                        <option value="true">활성</option>
+                        <option value="false">비활성</option>
+                    </select>
+                    <select name="sortDir" style="width: 100px;">
+                        <option value="desc">내림차순</option>
+                        <option value="asc">오름차순</option>
+                    </select>
+                    <input type="date" name="startDate" placeholder="시작일" style="width: 130px;" />
+                    <input type="date" name="endDate" placeholder="종료일" style="width: 130px;" />
+                    <input type="text" name="email" placeholder="검색" style="width: 150px;" />
+                    <button id="user-search-btn" class="btn-add">
+                        <span class="btn-icon material-icons">search</span>검색
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <section class="users-panel">
+            <div class="users-table-wrap">
+                <table class="users-table">
+                    <thead>
+                    <tr>
+                        <th>회원 ID</th>
+                        <th>이메일</th>
+                        <th>가입일</th>
+                        <th>변경일</th>
+                        <th>활성여부</th>
+                        <th>버튼</th>
+                    </tr>
+                    </thead>
+                    <tbody id="users-body">
+
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <button id="user-prevPage">이전</button>
+                <span id="user-pageNumbers"></span>
+                <button id="user-nextPage">다음</button>
+            </div>
+        </section>
+    </main>
+</div>
+
+<div id="userDetailModal" class="modal">
+    <div class="modal-content">
+        <button id="closeUserDetailModalBtn" class="close-button">X</button>
+        <h2>회원 상세 정보</h2>
+        <table>
+            <tr>
+                <th>회원 ID</th>
+                <td id="modalUserId"></td>
+            </tr>
+            <tr>
+                <th>이메일</th>
+                <td id="modalEmail"></td>
+            </tr>
+            <tr>
+                <th>가입일</th>
+                <td id="modalCreateDate"></td>
+            </tr>
+            <tr>
+                <th>변경일</th>
+                <td id="modalUpdatedAt"></td>
+            </tr>
+            <tr>
+                <th>이름</th>
+                <td id="modalName"></td>
+            </tr>
+            <tr>
+                <th>전화번호</th>
+                <td id="modalTel"></td>
+            </tr>
+            <tr>
+                <th>생년월일</th>
+                <td id="modalBirth"></td>
+            </tr>
+            <tr>
+                <th>회원 역할</th>
+                <td id="modalUserRole"></td>
+            </tr>
+            <tr>
+                <th>회원 상태</th>
+                <td id="modalUserStatus"></td>
+            </tr>
+            <tr>
+                <th>배송 ID</th>
+                <td id="modalDeliveryId"></td>
+            </tr>
+            <tr>
+                <th>주소</th>
+                <td id="modalAddress"></td>
+            </tr>
+            <tr>
+                <th>도시</th>
+                <td id="modalCity"></td>
+            </tr>
+            <tr>
+                <th>국가</th>
+                <td id="modalCountry"></td>
+            </tr>
+            <tr>
+                <th>지역</th>
+                <td id="modalRegion"></td>
+            </tr>
+            <tr>
+                <th>우편번호</th>
+                <td id="modalPostNum"></td>
+            </tr>
+            <tr>
+                <th>활성 상태</th>
+                <td id="modalActive"></td>
+            </tr>
+        </table>
+
+        <div class="modal-footer">
+            <button id="toggleActiveBtn" class="btn-add" style="margin-top: 10px">활성 상태 변경</button>
+        </div>
+    </div>
+</div>
+

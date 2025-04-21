@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <settings>
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+    </settings>
+    <typeAliases>
+        <package name="com.fineapple.domain.order_payment.entity"/>
+        <package name="com.fineapple.domain.user.entity"/>
+        <package name="com.fineapple.domain.product.entity"/>
+        <package name="com.fineapple.domain.logistics_inventory.entity"/>
+        <package name="com.fineapple.domain.support.entity"/>
+        <package name="com.fineapple.domain.employee"/>
+        <package name="com.fineapple.domain.order_payment.dto"/>
+        <package name="com.fineapple.domain.user.dto"/>
+        <package name="com.fineapple.application.dto"/>
+        <package name="com.fineapple.domain.product.dto"/>
+        <package name="com.fineapple.domain.user.dto"/>
+    </typeAliases>
+</configuration>
+
+

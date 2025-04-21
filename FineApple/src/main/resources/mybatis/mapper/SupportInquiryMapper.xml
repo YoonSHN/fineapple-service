@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fineapple.domain.support.repository.SupportInquiryMapper">
+
+    <resultMap id="InquiryResponseDtoMap" type="com.fineapple.domain.support.dto.InquiryResponseDto">
+        <result property="inquiryId" column="inquiry_id"/>
+        <result property="subject" column="subject"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="responseDueDate" column="response_due_date"/>
+        <result property="inquiryStatus" column="inquiry_status"/>
+    </resultMap>
+
+    <select id="selectInquiriesAll" resultMap="InquiryResponseDtoMap">
+        SELECT inquiry_id, subject, created_at, updated_at, response_due_date, inquiry_status
+        FROM SupportInquiry
+        ORDER BY created_at DESC
+    </select>
+    
+    <select id="selectInquiriesByUserId" parameterType="long" resultType="com.fineapple.domain.support.dto.InquiryResponseDto">
+        SELECT inquiry_id, subject, created_at, updated_at, response_due_date, inquiry_status
+        FROM SupportInquiry
+        WHERE user_info = #{UserInfo}
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="findUserInfoIdByUserId" parameterType="long" resultType="long">
+        SELECT user_info
+        FROM UserInfo
+        WHERE user_id = #{userId}
+    </select>
+
+    <insert id="insertInquiry" parameterType="com.fineapple.domain.support.dto.InquiryRequestDto"
+            useGeneratedKeys="true" keyProperty="inquiryId">
+        INSERT INTO SupportInquiry (
+            inquiry_id, subject, content, created_at,
+            user_info, inquiry_status, inquiry_type,
+            email, name, company_name, country_region,
+            acceptprivacypolicy, response_due_date,
+            prioritycode, order_id, orderitemdetail_id,
+            language_code, assigned_to, resolved_by
+        )
+        VALUES (
+                   #{inquiryId}, #{subject}, #{content}, now(),
+                   #{userInfo}, #{inquiryStatus}, #{inquiryType},
+                   #{email}, #{name}, #{companyName}, #{countryRegion},
+                   #{acceptPrivacyPolicy}, #{responseDueDate},
+                   #{priorityCode}, #{orderId}, #{orderItemDetailId},
+                   #{languageCode}, #{assignedTo}, #{resolvedBy}
+               )
+    </insert>
+
+    <!--필터 적용 select-->
+    <select id="findByFilters"
+            parameterType="map"
+            resultType="com.fineapple.domain.support.dto.InquiryResponseDto">
+        SELECT
+        inquiry_id AS id,
+        subject,
+        created_at AS createdAt,
+        response_due_date AS responseDueDate,
+        inquiry_status AS status
+        FROM SupportInquiry
+        <where>
+            <!-- 제목 검색 -->
+            <if test="searchTerm != null and searchTerm != ''">
+                AND LOWER(subject) LIKE CONCAT('%', LOWER(#{searchTerm}), '%')
+            </if>
+
+            <!-- 상태 필터링 -->
+            <if test="status != null and status != 'any'">
+                AND inquiry_status = #{status}
+            </if>
+        </where>
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="selectInquiryByInquiryId" resultType="com.fineapple.domain.support.entity.SupportInquiry">
+        SELECT
+            inquiry_id,
+            subject,
+            content,
+            created_at,
+            updated_at,
+            inquiry_status,
+            inquiry_type,
+            email,
+            name,
+            assigned_to,
+            resolved_by,
+            response_due_date,
+            user_info
+        FROM SupportInquiry
+        WHERE inquiry_id = #{inquiryId}
+    </select>
+
+</mapper>

@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fineapple.domain.logistics_inventory.repository.StockMapper">
+
+    <!-- 1. ResultMap 정의 -->
+    <resultMap id="stockDetailResultMap" type="com.fineapple.domain.logistics_inventory.dto.StockDetailDto">
+        <id property="stockId" column="stock_id"/>
+        <result property="productId" column="product_id"/>
+        <result property="storeId" column="store_id"/>
+        <result property="quantity" column="quantity"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="lastRestockDate" column="last_restock_date"/>
+        <result property="stockStatus" column="stock_status"/>
+        <result property="firstStockInDate" column="first_stock_in_date"/>
+        <result property="lastStockOutDate" column="last_stock_out_date"/>
+        <result property="minStockLevel" column="min_stock_level"/>
+        <result property="maxStockLevel" column="max_stock_level"/>
+        <result property="stockInQuantity" column="stock_in_quantity"/>
+        <result property="stockOutQuantity" column="stock_out_quantity"/>
+        <result property="isRestockRequired" column="is_restock_required"/>
+    </resultMap>
+
+    <resultMap id="stockDtoResultMap" type="com.fineapple.domain.logistics_inventory.dto.StockDto">
+        <id property="stockId" column="stock_id"/>
+        <result property="productId" column="product_id"/>
+        <result property="quantity" column="quantity"/>
+        <result property="storeId" column="store_id"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="stockStatus" column="stock_status"/>
+        <result property="isRestockRequired" column="is_restock_required"/>
+        <result property="codeName" column="code_name"/>
+    </resultMap>
+
+    <resultMap id="stockChangeHistoryResultMap" type="com.fineapple.domain.logistics_inventory.dto.StockChangeHistoryDto">
+        <id property="stockChangeId" column="stock_change_id"/>
+        <result property="stockId" column="stock_id"/>
+        <result property="storeId" column="store_id"/>
+        <result property="storeName" column="store_name"/>
+        <result property="productId" column="product_id"/>
+        <result property="stockInQuantity" column="stock_in_quantity"/>
+        <result property="stockOutQuantity" column="stock_out_quantity"/>
+        <result property="previousStock" column="previous_stock"/>
+        <result property="newStock" column="new_stock"/>
+        <result property="stockInReason" column="stock_in_reason"/>
+        <result property="stockOutReason" column="stock_out_reason"/>
+        <result property="changedAt" column="changed_at"/>
+        <result property="productName" column="product_name"/>
+    </resultMap>
+
+    <resultMap id="stockEntityResultMap" type="com.fineapple.domain.logistics_inventory.entity.Stock">
+        <id property="stockId" column="stock_id"/>
+        <result property="productId" column="product_id"/>
+        <result property="storeId" column="store_id"/>
+        <result property="quantity" column="quantity"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="lastRestockDate" column="last_restock_date"/>
+        <result property="stockStatus" column="stock_status"/>
+        <result property="firstStockInDate" column="first_stock_in_date"/>
+        <result property="lastStockOutDate" column="last_stock_out_date"/>
+        <result property="minStockLevel" column="min_stock_level"/>
+        <result property="maxStockLevel" column="max_stock_level"/>
+        <result property="safetyStockLevel" column="safety_stock_level"/>
+        <result property="stockInQuantity" column="stock_in_quantity"/>
+        <result property="stockOutQuantity" column="stock_out_quantity"/>
+        <result property="isRestockRequired" column="is_restock_required"/>
+    </resultMap>
+
+    <!-- 2. 페이징 쿼리 -->
+    <select id="findStockChangeHistories" resultMap="stockChangeHistoryResultMap">
+        SELECT h.*, p.name AS product_name
+        FROM StockChangeHistory h
+                 LEFT JOIN Product p ON h.product_id = p.product_id
+        WHERE p.name LIKE CONCAT('%', #{keyword}, '%')
+        ORDER BY h.changed_at DESC
+    </select>
+
+    <!-- 3. 전체 재고 조회 -->
+    <select id="getStockFromStoreAllProduct" resultMap="stockDtoResultMap">
+        SELECT s.stock_id, s.product_id, s.quantity, s.store_id, s.updated_at, s.stock_status, s.is_restock_required, c.code_name
+        FROM Stock s
+                 LEFT JOIN CommonCode c ON s.stock_status = c.code
+        WHERE s.store_id = #{storeId}
+    </select>
+
+    <!-- 4. 상세 조회 -->
+    <select id="getStockFromStoreByProductId" resultMap="stockDetailResultMap">
+        SELECT s.*, p.name AS productName, st.name AS storeName, c.code_name AS codeName
+        FROM Stock s
+                 LEFT JOIN Product p ON s.product_id = p.product_id
+                 LEFT JOIN Store st ON s.store_id = st.store_id
+                 LEFT JOIN CommonCode c ON s.stock_status = c.code
+        WHERE s.store_id = #{storeId} AND s.product_id = #{productId}
+    </select>
+
+    <!-- 5. 재고 등록 -->
+    <insert id="uploadNewStock" parameterType="com.fineapple.domain.logistics_inventory.entity.Stock"
+            useGeneratedKeys="true" keyProperty="stockId">
+        INSERT INTO Stock (
+            quantity, created_at, updated_at, last_restock_date, product_id,
+            store_id, stock_status, first_stock_in_date, last_stock_out_date,
+            min_stock_level, max_stock_level, safety_stock_level,
+            stock_in_quantity, stock_out_quantity, is_restock_required
+        ) VALUES (
+                     #{quantity}, #{createdAt}, #{updatedAt}, #{lastRestockDate}, #{productId},
+                     #{storeId}, #{stockStatus}, #{firstStockInDate}, #{lastStockOutDate},
+                     #{minStockLevel}, #{maxStockLevel}, #{safetyStockLevel},
+                     #{stockInQuantity}, #{stockOutQuantity}, #{isRestockRequired}
+                 )
+    </insert>
+
+    <!-- ✅ 6. 재고 수정 -->
+    <update id="updateStock" parameterType="map">
+        UPDATE Stock
+        SET
+            quantity = #{quantity},
+            updated_at = #{updatedAt},
+            last_restock_date = #{lastRestockDate},
+            stock_status = #{stockStatus},
+            first_stock_in_date = #{firstStockInDate},
+            last_stock_out_date = #{lastStockOutDate},
+            min_stock_level = #{minStockLevel},
+            max_stock_level = #{maxStockLevel},
+            safety_stock_level = #{safetyStockLevel},
+            stock_in_quantity = #{stockInQuantity},
+            stock_out_quantity = #{stockOutQuantity}
+        WHERE stock_id = #{stockId}
+    </update>
+
+    <!--  7. 입출고 내역 저장 -->
+    <insert id="insertStockChangeHistory" parameterType="com.fineapple.domain.logistics_inventory.entity.StockChangeHistory"
+            useGeneratedKeys="true" keyProperty="stockChangeId">
+        INSERT INTO StockChangeHistory (
+            stock_id, product_id, store_id, store_name,
+            stock_in_quantity, stock_in_reason, stock_out_quantity, stock_out_reason,
+            previous_stock, new_stock, changed_at
+        ) VALUES (
+                     #{stockId}, #{productId}, #{storeId}, #{storeName},
+                     #{stockInQuantity}, #{stockInReason}, #{stockOutQuantity}, #{stockOutReason},
+                     #{previousStock}, #{newStock}, #{changedAt}
+                 )
+    </insert>
+
+    <!--  8. 재고 부족 카운트 -->
+    <select id="selectStockCountQuantityToday" parameterType="Map" resultType="int">
+        <![CDATA[
+        SELECT COUNT(*)
+        FROM Stock
+        WHERE quantity <= 10
+          AND DATE(created_at) >= #{startDate}
+          AND DATE(created_at) < #{endDate}
+        ]]>
+    </select>
+
+    <!--  9. 전체 입출고 내역 조회 (비페이징) -->
+    <select id="selectAllStockChangeHistory" resultType="com.fineapple.domain.logistics_inventory.dto.StockChangeHistoryDto">
+        SELECT *
+        FROM StockChangeHistory
+        ORDER BY changed_at DESC
+    </select>
+
+    <!-- 10. 개수 조회 -->
+    <select id="countStockChangeHistories" resultType="int">
+        SELECT COUNT(*)
+        FROM StockChangeHistory h
+                 LEFT JOIN Product p ON h.product_id = p.product_id
+        WHERE p.name LIKE CONCAT('%', #{keyword}, '%')
+    </select>
+
+    <!--db에 존재하는 stock 값인지 확인 -->
+    <select id="findStockByStoreIdAndProductId"
+            resultMap = "stockDetailResultMap"
+            parameterType="map">
+        SELECT *
+        FROM Stock
+        WHERE store_id = #{storeId} AND product_id = #{productId}
+        LIMIT 1
+    </select>
+
+
+
+</mapper>

@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fineapple.domain.order_payment.repository.OrderUserMapper">
+
+    <resultMap id="orderItemDetailResultMap" type="com.fineapple.domain.order_payment.entity.OrderItemDetail">
+        <result column="product_id" property="productId"/>
+        <result column="option_id" property="optionId"/>
+        <result column="item_name" property="name"/>  <!-- DTO의 itemName을 엔티티의 name과 매핑 -->
+        <result column="item_quantity" property="quantity"/>
+        <result column="item_price" property="price"/>
+        <result column="item_discount_price" property="discountPrice"/>
+    </resultMap>
+
+    <resultMap id="orderUserResultMap" type="OrderUserDto">
+        <id property="orderCode" column="orderCode"/>
+        <result property="userId" column="userId"/>
+        <result property="guestId" column="guestId"/>
+        <result property="finalPrice" column="finalPrice"/>
+        <result property="totalPrice" column="totalPrice"/>
+        <result property="createdAt" column="createdAt"/>
+        <result property="orderStatus" column="orderStatus"/>
+        <result property="paymentMethod" column="paymentMethod"/>
+
+        <!-- 사용자 정보 -->
+        <result property="userName" column="userName"/>
+        <result property="userPhone" column="userPhone"/>
+        <result property="userEmail" column="userEmail"/>
+        <result property="userAddress" column="userAddress"/>
+        <result property="userAddressDetail" column="userAddressDetail"/>
+
+        <!-- collection: 여러 주문 아이템 매핑 -->
+        <collection property="orderItems" ofType="OrderItemDetailUserDto">
+            <result property="itemName" column="itemName"/>
+            <result property="itemQuantity" column="itemQuantity"/>
+            <result property="itemPrice" column="itemPrice"/>
+            <result property="itemDiscountPrice" column="itemDiscountPrice"/>
+        </collection>
+    </resultMap>
+
+    <!-- 사용자가 주문 상세 페이지에서 볼 정보 -->
+    <select id="selectOrderItemDetailByOrderCode" resultMap="orderUserResultMap">
+        SELECT o.order_code      AS orderCode,
+               o.total_price     AS totalPrice,
+               o.discount_price  AS discountPrice,
+               o.final_price     AS finalPrice,
+               o.payment_method  AS paymentMethod,
+               o.created_at      AS createdAt,
+               o.order_status    AS orderStatus,
+               o.payment_method  AS paymentMethod,
+
+               oi.name           AS itemName,
+               oi.quantity       AS itemQuantity,
+               oi.price          AS itemPrice,
+               oi.discount_price AS itemDiscountPrice,
+
+               -- 회원/비회원 이름
+               CASE
+                   WHEN o.user_id IS NOT NULL THEN ui.name
+                   WHEN o.guest_id IS NOT NULL THEN g.name
+                   ELSE NULL
+                   END           AS userName,
+
+               -- 회원/비회원 전화번호
+               CASE
+                   WHEN o.user_id IS NOT NULL THEN ui.tel
+                   WHEN o.guest_id IS NOT NULL THEN g.tel
+                   ELSE NULL
+                   END           AS userPhone,
+
+               -- 회원 이메일 (비회원은 NULL)
+               u.email           AS userEmail,
+
+               -- 회원/비회원 주소 정보
+               CASE
+                   WHEN o.user_id IS NOT NULL THEN ua.road_num
+                   WHEN o.guest_id IS NOT NULL THEN ga.road_num
+                   ELSE NULL
+                   END           AS userAddress,
+
+               CASE
+                   WHEN o.user_id IS NOT NULL THEN ua.address
+                   WHEN o.guest_id IS NOT NULL THEN ga.address
+                   ELSE NULL
+                   END           AS userAddressDetail
+
+        FROM Orders o
+                 LEFT JOIN User u ON o.user_id = u.user_id
+                 LEFT JOIN UserInfo ui ON u.user_id = ui.user_id
+                 LEFT JOIN Address ua ON ui.user_info = ua.user_info -- 회원 주소
+                 LEFT JOIN Guest g ON o.guest_id = g.guest_id -- 비회원 정보 조회
+                 LEFT JOIN Address ga ON g.guest_id = ga.guest_id -- 비회원 주소
+                 LEFT JOIN OrderItemDetail oi ON o.order_id = oi.order_id
+
+        WHERE o.order_code = #{orderCode};
+    </select>
+
+    <!-- 회원/비회원이 주문 페이지에서 볼 주문 요약 정보 -->
+    <select id="selectRecentOrdersById" resultType="com.fineapple.domain.order_payment.dto.OrderUserDto">
+        SELECT
+        o.order_code AS orderCode,
+        o.created_at AS createdAt,
+        o.total_price AS totalPrice,
+        o.discount_price AS discountPrice,
+        o.order_status AS orderStatus,
+        o.payment_method AS paymentMethod,
+
+        oi.name AS itemName,
+        oi.quantity AS itemQuantity,
+        oi.price AS itemPrice,
+        oi.discount_price AS itemDiscountPrice,
+        oi.coupon_applied AS itemCouponApplied,
+        COALESCE(oi.additional, '') AS itemAdditional,
+        oi.additional_price AS itemAdditionalPrice,
+        oi.item_status AS itemStatus,
+
+        pi.image_url AS imageUrl,
+        pi.alt_text AS altText,
+
+        CASE
+        WHEN o.user_id IS NOT NULL THEN ui.name
+        WHEN o.guest_id IS NOT NULL THEN g.name
+        ELSE NULL
+        END AS userName
+
+        FROM Orders o
+        LEFT JOIN User u ON o.user_id = u.user_id
+        LEFT JOIN UserInfo ui ON u.user_id = ui.user_id
+        LEFT JOIN Guest g ON o.guest_id = g.guest_id
+        LEFT JOIN OrderItemDetail oi ON o.order_id = oi.order_id
+        LEFT JOIN Product_Image pi ON oi.product_id = pi.product_id
+
+        WHERE 1=1
+        <if test="userId != null">
+            AND o.user_id = #{userId}
+        </if>
+        <if test="guestId != null">
+            AND o.guest_id = #{guestId}
+        </if>
+
+        ORDER BY o.created_at DESC
+    </select>
+
+
+    <!--주문 생성(주문 접수 상태) 하드코딩하지 않으면 에러남-->
+    <insert id="insertOrderAndItems" parameterType="OrderUserDto" useGeneratedKeys="true" keyProperty="orderId">
+
+        INSERT INTO Orders (order_code, total_price, discount_price, final_price, guest_id, user_id,
+        payment_method, is_cancelled, order_status)
+        VALUES (#{orderCode}, #{totalPrice}, #{discountPrice}, #{finalPrice}, #{guestId}, #{userId},
+        'OR0501','0','OR0101');
+        <!-- 생성된 order_id 조회 -->
+        <selectKey keyProperty="orderId" resultType="Long" order="AFTER">
+            SELECT LAST_INSERT_ID();
+        </selectKey>
+    </insert>
+
+    <!-- orderCode가 이미 존재하는지 확인하는 쿼리 -->
+    <select id="existsByOrderCode" resultType="boolean">
+        SELECT COUNT(1) > 0
+        FROM Orders
+        WHERE order_code = #{orderCode}
+    </select>
+
+    <!-- 주문 상태 삽입(주문 항목, 카드결제) -->
+    <insert id="insertOrderItemDetails" parameterType="java.util.List">
+        INSERT INTO OrderItemDetail
+        (name, quantity, price, discount_price, coupon_applied, additional_price, additional, order_id, product_id,
+        option_id, item_status)
+        VALUES
+        <foreach collection="orderItems" item="item" separator=",">
+            (#{item.itemName}, #{item.itemQuantity}, #{item.itemPrice}, #{item.itemDiscountPrice},
+            0, 0, null, #{orderId}, #{item.productId},
+            #{item.optionId}, 'OR0401')
+        </foreach>
+    </insert>
+
+    <insert id="insertOrderStatus">
+        INSERT INTO OrderStatus (order_id,
+                                  orderstatus_status,
+                                  payment_status)
+        VALUES (#{orderId},
+                #{orderStatus},
+                #{paymentStatus})
+    </insert>
+
+    <update id="updateOrderStatus">
+        UPDATE OrderStatus
+        SET payment_status = #{status}
+        WHERE order_id = #{orderId}
+    </update>
+
+    <select id="getProductNameById" resultType="String">
+        SELECT name
+        FROM Product
+        WHERE product_id = #{productId}
+    </select>
+
+    <!-- 주문 ID로 주문 조회 -->
+    <select id="selectOrderById" resultType="com.fineapple.domain.order_payment.dto.OrderUserDto">
+        SELECT *
+        FROM Orders
+        WHERE order_id = #{orderId}
+    </select>
+
+    <select id="getPaymentIdByOrderId" resultType="Long" parameterType="Long">
+        SELECT payment_id
+        FROM Payment
+        WHERE order_id = #{orderId}
+    </select>
+
+    <!--    사용자가 주문 취소 요청 시-->
+    <!-- 주문 상태를 취소요청으로 업데이트 -->
+    <update id="cancelOrder" parameterType="Long">
+        UPDATE Orders
+        SET order_status = 'OR0103',
+            updated_at   = NOW()
+        WHERE order_code = #{orderCode}
+          AND order_status != 'OR0103';
+    </update>
+
+    <select id="selectOrderItemsByOrderId" resultType="com.fineapple.domain.order_payment.dto.OrderItemDetailUserDto">
+        SELECT product_id, quantity
+        FROM OrderItemDetail
+        WHERE order_id = #{orderId}
+    </select>
+
+    <select id="getUserInfo" parameterType="long" resultType="com.fineapple.domain.order_payment.dto.OrderUserInfoDto">
+        SELECT ui.name,
+               a.address,
+               a.road_num AS addressDetail,
+               ui.tel     AS contact,
+               u.email    AS email
+        FROM User u
+                 LEFT JOIN UserInfo ui ON u.user_id = ui.user_id
+                 LEFT JOIN Address a ON ui.user_info = a.user_info
+        WHERE u.user_id = #{userId}
+    </select>
+
+
+    <select id="findOrderItemByOrderId" parameterType="long" resultType="com.fineapple.domain.order_payment.dto.OrderItemDetailUserDto">
+        select product_id AS productId,
+               option_id AS optionId,
+               name AS itemName,
+               quantity AS itemQuantity,
+               price AS itemPrice,
+               discount_price AS itemDiscountPrice
+        from OrderItemDetail
+        where order_id = #{orderId}
+    </select>
+
+
+
+</mapper>

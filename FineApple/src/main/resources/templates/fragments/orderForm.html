@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>주문 정보 입력</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reset-css@5.0.2/reset.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"/>
+  <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"/>
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/order.css">
+
+  <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+  <script type="text/javascript" src="https://cdn.iamport.kr/js/iamport.payment-1.2.0.js"></script>
+  <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+
+  <script th:inline="javascript">
+    const IMP_CODE = /*[[${impCode}]]*/ "default";
+  </script>
+</head>
+<body>
+
+<!-- 헤더 -->
+<header class="global-nav">
+  <div class="overlay"></div>
+  <div class="inner">
+    <div class="nav-left">
+      <a th:href="@{/}" class="logo-container">
+        <img src="/images/logo&etc/FineApple-logo.png" style="height: 24px;">
+      </a>
+    </div>
+    <nav class="nav-menu">
+      <ul>
+        <li class="has-submenu" data-menu="store"><a th:href="@{/}">스토어</a></li>
+        <li class="has-submenu" th:each="category : ${mainCategories}" th:data-menu="${category.path}">
+          <a th:href="@{/store/path/{path}(path=${category.path})}" th:text="${category.name}"></a>
+        </li>
+        <li class="has-submenu" data-menu="support"><a th:href="@{/}">고객지원</a></li>
+      </ul>
+    </nav>
+    <div class="search">
+      <input type="text"/>
+      <div class="material-icons" data-menu="search">search</div>
+    </div>
+    <div class="local-mall" data-menu="cart">
+      <div class="material-icons">local_mall</div>
+    </div>
+  </div>
+
+  <div id="global-dropdown" class="dropdown">
+    <div class="dropdown-inner" id="dropdown-content"></div>
+  </div>
+</header>
+
+<!-- 본문 -->
+<main>
+  <h2>주문 상품</h2>
+  <div id="selectedItemsContainer"></div>
+
+  <p><strong>총 결제 금액: <span id="totalPriceDisplay">0</span>원</strong></p>
+
+  <h2>주문자 정보</h2>
+  <form id="orderForm">
+    <label>이름: <input type="text" id="customerName" required></label><br>
+    <label>이메일 주소: <input type="text" id="email" required></label><br>
+    <label>주소: <input type="text" id="addressDetail" required></label><br>
+    <label>상세 주소: <input type="text" id="address" required></label><br>
+    <label>연락처: <input type="text" id="contact" required></label><br>
+    <label>결제 수단:
+      <select id="paymentMethod">
+        <option value="OR0501">카드 결제</option>
+<!--        <option value="OR0502">계좌 이체</option>-->
+      </select>
+    </label><br>
+    <button type="submit">결제하기</button>
+  </form>
+
+  <div id="orderResult"></div>
+</main>
+
+<!-- 푸터 -->
+<footer>
+  <div class="footer-logo" style="align-items: left;">
+    <img src="/images/logo&etc/FineApple-logo.png" style="height: 24px; margin-right: 30px;">
+  </div>
+  <section class="footer-links">
+    <div class="footer-column">
+      <h4>쇼핑하기</h4>
+      <ul>
+        <li><a href="#">파인북</a></li>
+        <li><a href="#">파인폰</a></li>
+        <li><a href="#">파인패드</a></li>
+        <li><a href="#">파인워치</a></li>
+        <li><a href="#">파인팟</a></li>
+        <li><a href="#">액세서리</a></li>
+      </ul>
+    </div>
+    <div class="footer-column">
+      <h4>서비스</h4>
+      <ul>
+        <li><a href="#">Fine Music</a></li>
+        <li><a href="#">Fine TV+</a></li>
+        <li><a href="#">Fine Fitness+</a></li>
+        <li><a href="#">Fine Arcade</a></li>
+      </ul>
+    </div>
+    <div class="footer-column">
+      <h4>Apple Store</h4>
+      <ul>
+        <li><a href="#">매장 찾기</a></li>
+        <li><a href="#">Genius Bar</a></li>
+        <li><a href="#">오늘의 Apple</a></li>
+      </ul>
+    </div>
+    <div class="footer-column">
+      <h4>고객지원</h4>
+      <ul>
+        <li><a href="#">FineApple 지원</a></li>
+        <li><a href="#">주문 상태</a></li>
+        <li><a href="#">반품 및 환불</a></li>
+      </ul>
+    </div>
+  </section>
+  <section class="footer-legal">
+    <p>더 많은 방법으로 쇼핑하기: <a href="#">Fine Store를 방문</a>하거나, <a href="tel:080-XXX-XXXX">080-XXX-XXXX</a>번으로 전화하세요.</p>
+    <p>대한민국 © 2025 Fine Inc. 모든 권리 보유.</p>
+  </section>
+</footer>
+
+<script src="/js/userOrderForm.js"></script>
+</body>
+</html>

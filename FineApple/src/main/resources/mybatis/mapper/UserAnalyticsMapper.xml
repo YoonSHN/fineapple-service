@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fineapple.domain.user.repository.UserAnalyticsMapper">
+
+    <select id="getDailyLoginCount" resultType="TimeSeriesDto">
+        SELECT DATE(login_time) AS date, 'ALL' AS groupKey, COUNT(*) AS value
+        FROM LoginHistory
+        GROUP BY DATE(login_time)
+    </select>
+
+    <select id="getDailySignupCount" resultType="TimeSeriesDto">
+        SELECT DATE(create_date) AS date, 'ALL' AS groupKey, COUNT(*) AS value
+        FROM User
+        GROUP BY DATE(create_date)
+    </select>
+
+</mapper>

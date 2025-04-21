@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fineapple.domain.product.repository.CategoryMapper">
+
+
+    <select id="selectCategory" resultType="com.fineapple.domain.product.dto.CategoryDto">
+        SELECT category_id AS categoryId,
+               name,
+               path,
+               description,
+               parent_id AS parentId,
+               visibility_status,
+               0 AS depth
+        FROM Category
+        WHERE parent_id IS NULL
+        ORDER BY category_id
+    </select>
+    
+    <select id="selectCategoryTreeByPath" parameterType="string" resultType="com.fineapple.domain.product.dto.CategoryDto">
+        WITH RECURSIVE Category_Tree AS (
+            SELECT
+                category_id,
+                name,
+                path,
+                description,
+                parent_id,
+                visibility_status,
+                0 AS depth,
+                CAST(category_id AS CHAR(350)) AS tree
+            FROM Category
+            WHERE parent_id IS NULL AND path = #{path}
+
+            UNION ALL
+
+            SELECT
+                c.category_id,
+                c.name,
+                c.path,
+                c.description,
+                c.parent_id,
+                c.visibility_status,
+                ct.depth + 1,
+                CONCAT(ct.tree, '>', c.category_id)
+            FROM Category c
+                     JOIN Category_Tree ct ON c.parent_id = ct.category_id
+        )
+        SELECT category_id AS categoryId,
+               name,
+               description,
+               parent_id AS parentId,
+               visibility_status AS visibilityStatus,
+               depth
+        FROM Category_Tree
+        ORDER BY tree
+    </select>
+    
+    
+
+</mapper>

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"  th:data-logged-in="${#authorization.expression('isAuthenticated()')}">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <title>FineApple Store</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reset-css@5.0.2/reset.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+  <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <script defer src="/js/index.js"></script>
+</head>
+<body>
+<div id="user-id-data" th:attr="data-user-id=${userId}"></div>
+
+
+  <!-- 내비게이션 -->
+  <header class="global-nav">
+    <div class="overlay"></div>
+    <div class="inner">
+      <div class="nav-left">
+        <a th:href="@{/}" class="logo-container">
+          <img src="/images/logo&etc/FineApple-logo.png" style="height : 24px;">
+        </a>
+      </div>
+      <nav class="nav-menu">
+        <ul>
+          <li class="has-submenu" data-menu="store"><a th:href="@{/}">스토어</a></li>
+          <li class="has-submenu"
+              th:each="category : ${mainCategories}"
+              th:data-menu="${category.path}">
+            <a th:href="@{/store/path/{path}(path=${category.path})}"
+               th:text="${category.name}"></a>
+          </li>
+          <li class="has-submenu" data-menu="support"><a th:href="@{/}">고객지원</a></li>
+        </ul>
+      </nav>
+      <div class="search">
+        <input type="text"/>
+        <div class="material-icons" data-menu="search">search</div>
+      </div>
+      <div class="local-mall" data-menu="cart">
+        <div class="material-icons">local_mall</div>
+      </div>
+    </div>
+
+    <div id="global-dropdown" class="dropdown">
+      <div class="dropdown-inner" id="dropdown-content"></div>
+    </div>
+  </header>
+
+  <div class="top-banner">
+    <p>
+      🎁 지금 FineApple에서만! 프리미엄 쇼핑의 시작, FineApple에서 할인된 가격으로 만나보세요.
+      <a href="#">자세히 보기</a>
+    </p>
+  </div>
+
+  <!-- 메인 콘텐츠 -->
+  <main>
+    <!-- 메인 섹션 -->
+    <section class="hero">
+      <div class="hero-texts">
+        <h1>남다른 : 당신이 좋아하는 제품을<br>사는 가장 좋은 방법.</h1>
+        <p class="sub-text">
+          Fine Store 전문가와 상담하거나<br>
+          나에게 맞는 제품을 찾아보세요.
+        </p>
+      </div>
+      <div class="hero-support">
+        <img src="/images/logo&etc/FineManager-small.jpeg" alt="상담 아이콘" class="support-avatar">
+        <p>Fine Store 전문가<br>쇼핑 지원 받기</p>
+        <a href="#" class="chat-btn">채팅하기</a>
+      </div>
+    </section>
+
+    <!-- 제품 카테고리 아이콘 섹션 -->
+    <section class="product-icons">
+      <div class="swiper-container product-icons__swiper">
+        <div class="swiper-wrapper">
+          <div class="swiper-slide"><a href="#"><img src="/images/FineBook/FineBook-Set1.png" alt="Mac">파인북</a></div>
+          <div class="swiper-slide"><a href="#"><img src="/images/FinePhone/FinePhone-Set1.png" alt="iPhone">파인폰</a></div>
+          <div class="swiper-slide"><a href="#"><img src="/images/FinePad/Pro/FinePad-Pro1.png" alt="iPad">파인패드</a></div>
+          <div class="swiper-slide"><a href="#"><img src="/images/FineWatch/Base/FineWatch-Base1.png" alt="Fine Watch">파인워치</a></div>
+          <div class="swiper-slide"><a href="#"><img src="/images/FinePods/Pro/FinePods-Pro1.png" alt="airpods">파인팟</a></div>
+          <div class="swiper-slide"><a href="#"><img src="/images/FineVision/FineVision-1.png" alt="AirPods">파인비전</a></div>
+          <div class="swiper-slide"><a href="#"><img src="/images/FinePhone/FinePhone-Set1.png" alt="iPhone">파인폰</a></div>
+          <div class="swiper-slide"><a href="#"><img src="/images/Desktop/iFine-blue1-deleteback.png" alt="Mac">아이파인</a></div>
+        </div>
+        <div class="swiper-button-prev"></div>
+        <div class="swiper-button-next"></div>
+      </div>
+    </section>
+
+    <!-- 신제품 소개 섹션 -->
+    <section class="highlight-section">
+      <div class="highlight-grid">
+        <!-- 메인 제품 -->
+        <div class="highlight-main">
+          <img src="/images/logo&etc/FineSelling.jpeg" alt="최신 제품">
+          <div class="highlight-main-text">
+            <h2>🎉 홈페이지 리뉴얼 기념 혜택</h2>
+            <p class="benefit-desc">신규 가입 고객 전원에게 <strong>즉시할인 최대 3%</strong> + <strong>최대 4만원 쿠폰</strong> 지급!</p>
+            <ul class="benefit-list">
+              <li>✔ 신규 회원 전용 웰컴 쿠폰 10,000원</li>
+              <li>✔ 첫 구매 시 추가 3% 즉시 할인</li>
+              <li>✔ 한정 기간 한정 수량 이벤트</li>
+            </ul>
+            <a href="/signup" class="benefit-btn">지금 가입하고 혜택 받기</a>
+          </div>
+        </div>
+
+        <!-- 서브 제품들 -->
+        <div class="highlight-sub-items">
+          <div class="sub-item">
+            <img src="/images/FineBook/Pro/FineBook-Pro1.png" alt="FineBook">
+            <p class="product-title">파인 북 16</p>
+            <div class="price-info">
+              <p><span class="label">쿠폰 적용 예상가</span> <span class="price">1,731,400원</span></p>
+              <p><span class="label">적립 예정 포인트</span> <span class="point">1,731P</span></p>
+              <p class="rating"><i class="fa-solid fa-star"></i> <span>4.9</span> (311)</p>
+            </div>
+          </div>
+
+          <div class="sub-item">
+            <img src="/images/FinePods/Pro/FinePods-Pro2.jpeg" alt="FinePods">
+            <p class="product-title">파인팟 5세대</p>
+            <div class="price-info">
+              <p><span class="label">쿠폰 적용 예상가</span> <span class="price">1,731,400원</span></p>
+              <p><span class="label">적립 예정 포인트</span> <span class="point">1,731P</span></p>
+              <p class="rating"><i class="fa-solid fa-star"></i> <span>4.9</span> (92)</p>
+            </div>
+          </div>
+
+          <div class="sub-item">
+            <img src="/images/FinePad/Air/FinePad-Air2.png" alt="Tab S10">
+            <p class="product-title">파인 패드 13인치 1TB</p>
+            <div class="price-info">
+              <p><span class="label">쿠폰 적용 예상가</span> <span class="price">2,114,500원</span></p>
+              <p><span class="label">적립 예정 포인트</span> <span class="point">2,114P</span></p>
+              <p class="rating"><i class="fa-solid fa-star"></i> <span>4.8</span> (62)</p>
+            </div>
+          </div>
+
+          <div class="sub-item">
+            <img src="/images/FineWatch/Ultra/FineWatch-ultra2.jpg" alt="Buds3 Pro">
+            <p class="product-title">파인워치 46MM</p>
+            <div class="price-info">
+              <p><span class="label">쿠폰 적용 예상가</span> <span class="price">1,272,000원</span></p>
+              <p><span class="label">적립 예정 포인트</span> <span class="point">1,272P</span></p>
+              <p class="rating"><i class="fa-solid fa-star"></i> <span>4.9</span> (51)</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- 고객혜택 -->
+    <section class="new-products benefit">
+      <h2>
+        남다른 <strong>Fine Store</strong>.
+        <span style="color: gray">이곳에서 쇼핑해야 하는 더욱더 많은 이유.</span>
+      </h2>
+      <div class="swiper-container benefit-swiper">
+        <div class="swiper-wrapper">
+          <div class="swiper-button-prev"></div>
+          <div class="swiper-button-next"></div>
+          <div class="swiper-slide">
+            <article class="benefit-item">
+              <div class="benefit-icon-text">
+                <span class="material-symbols-outlined icon green">credit_card</span>
+                <div class="benefit-text">
+                  <h3>기분 좋은 결제 옵션</h3>
+                  <p>유연한 할부와 다양한 혜택을 누려보세요.</p>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <div class="swiper-slide">
+            <article class="benefit-item">
+              <div class="benefit-icon-text">
+                <span class="material-symbols-outlined icon blue">sell</span>
+                <div class="benefit-text">
+                  <h3>보상 판매 지원</h3>
+                  <p>쓰던 기기를 보상받고 새 제품을 더 저렴하게.</p>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <div class="swiper-slide">
+            <article class="benefit-item">
+              <div class="benefit-icon-text">
+                <span class="material-symbols-outlined icon green">local_shipping</span>
+                <div class="benefit-text">
+                  <h3>간편한 무료 배송</h3>
+                  <p>매장에서 수령하거나 집으로 무료 배송.</p>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <div class="swiper-slide">
+            <article class="benefit-item">
+              <div class="benefit-icon-text">
+                <span class="material-symbols-outlined icon purple">sentiment_satisfied</span>
+                <div class="benefit-text">
+                  <h3>맞춤 각인 서비스</h3>
+                  <p>이모티콘, 이름, 숫자를 무료로 각인해보세요.</p>
+                </div>
+              </div>
+            </article>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+
+  </main>
+
+  <!-- 푸터 -->
+<footer>
+  <div class="footer-logo" style="display: flex; justify-content: center;">
+    <img src="/images/logo&etc/FineApple-logo.png" style="height: 24px;">
+  </div>
+  <section class="footer-links">
+    <div class="footer-column">
+      <h4>쇼핑하기</h4>
+      <ul>
+        <li><a href="#">파인북</a></li>
+        <li><a href="#">파인폰</a></li>
+        <li><a href="#">파인패드</a></li>
+        <li><a href="#">파인워치</a></li>
+        <li><a href="#">파인팟</a></li>
+        <li><a href="#">액세서리</a></li>
+      </ul>
+    </div>
+    <div class="footer-column">
+      <h4>서비스</h4>
+      <ul>
+        <li><a href="#">Fine Music</a></li>
+        <li><a href="#">Fine TV+</a></li>
+        <li><a href="#">Fine Fitness+</a></li>
+        <li><a href="#">Fine Arcade</a></li>
+      </ul>
+    </div>
+    <div class="footer-column">
+      <h4>Apple Store</h4>
+      <ul>
+        <li><a href="#">매장 찾기</a></li>
+        <li><a href="#">Genius Bar</a></li>
+        <li><a href="#">오늘의 Apple</a></li>
+      </ul>
+    </div>
+    <div class="footer-column">
+      <h4>고객지원</h4>
+      <ul>
+        <li><a href="#">FineApple 지원</a></li>
+        <li><a href="#">주문 상태</a></li>
+        <li><a href="#">반품 및 환불</a></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="footer-legal">
+    <p>더 많은 방법으로 쇼핑하기: <a href="#">Fine Store를 방문</a>하거나, <a href="tel:080-XXX-XXXX">080-XXX-XXXX</a>번으로 전화하세요.</p>
+    <p>대한민국 © 2025 FineApple Inc. 모든 권리 보유.</p>
+  </section>
+</footer>
+
+</body>
+<div id="fineapple-chat-root"></div>
+<script src="/js/fineapple-chat.js"></script>
+</html>

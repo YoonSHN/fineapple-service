@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fineapple.domain.order_payment.repository.OrderPaymentMapper">
+
+    <insert id="insertPaymentInfo" parameterType="com.fineapple.domain.order_payment.entity.Payment" useGeneratedKeys="true" keyProperty="paymentId">
+        INSERT INTO Payment (
+            order_id,
+            pg_approval_code,
+            pg_type,
+            receipt_url,
+            card_name,
+            card_quota,
+            payment_status,
+            failure_code,
+            total_amount,
+            paid_at,
+            pg_unique_id
+        ) VALUES (
+                     #{orderId},
+                     #{pgApprovalCode},
+                     #{pgType},
+                     #{receiptUrl},
+                     #{cardName},
+                     #{cardQuota},
+                     #{paymentStatus},
+                     #{failureCode},
+                     #{totalAmount},
+                     #{paidAt},
+                     #{pgUniqueId}
+                 )
+    </insert>
+
+    <insert id="insertPaymentDetailInfo" parameterType="com.fineapple.domain.order_payment.entity.PaymentDetail" useGeneratedKeys="true" keyProperty="detailId">
+        INSERT INTO PaymentDetail (payment_id, orderitemdetail_id, product_name, paid_amount, quantity, cancelled_quantity, cancelled_amount, fail_reason, cancelled_at, created_at, updated_at)
+        VALUES (#{paymentId}, #{orderItemDetailId}, #{productName}, #{paidAmount}, #{quantity}, #{cancelledQuantity}, #{cancelledAmount}, #{failReason}, #{cancelledAt}, #{createdAt}, #{updatedAt});
+    </insert>
+
+
+</mapper>

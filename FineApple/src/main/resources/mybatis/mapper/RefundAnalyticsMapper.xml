@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fineapple.domain.order_payment.repository.RefundAnalyticsMapper">
+
+    <select id="getDailyRefundAmount" resultType="TimeSeriesDto">
+        SELECT DATE(requested_at) AS date, 'ALL' AS groupKey, SUM(refund_total_amount) AS value
+        FROM Refund
+        GROUP BY DATE(requested_at)
+    </select>
+
+    <select id="getRefundFailCount" resultType="TimeSeriesDto">
+        SELECT DATE(requested_at) AS date, 'ALL' AS groupKey, COUNT(*) AS value
+        FROM Refund
+        WHERE refund_fail_reason IS NOT NULL
+        GROUP BY DATE(requested_at)
+    </select>
+
+</mapper>

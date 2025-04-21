@@ -1,0 +1,141 @@
+/* userOrderList.css */
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+    background-color: #f5f5f7;
+    color: #1d1d1f;
+    margin: 0;
+    padding: 0;
+}
+
+main {
+    max-width: 1200px;
+    margin: 60px auto;
+    padding: 40px 32px;
+    background: #fff;
+    border-radius: 24px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+}
+
+main h1 {
+    font-size: 32px;
+    font-weight: 600;
+    margin-bottom: 40px;
+    text-align: center;
+    color: #1d1d1f;
+}
+
+.order-list-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.order-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 16px;
+}
+
+.order-table thead th {
+    padding: 16px 20px;
+    background-color: #fafafa;
+    border-bottom: 2px solid #e0e0e0;
+    text-align: left;
+    font-weight: 600;
+    color: #333;
+}
+
+.order-table tbody td {
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+    color: #444;
+}
+
+.order-table tbody tr:hover {
+    background-color: #f9f9f9;
+}
+
+.order-table a {
+    color: #0071e3;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.order-table a:hover {
+    text-decoration: underline;
+}
+
+#emptyOrderMessage {
+    font-size: 18px;
+    color: #777;
+}
+
+.go-shopping-btn {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #0071e3;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+}
+
+.go-shopping-btn:hover {
+    background-color: #005bb5;
+}
+
+.pagination-container {
+    margin-top: 30px;
+    text-align: center;
+}
+
+.pagination-container button {
+    padding: 8px 14px;
+    margin: 0 4px;
+    background-color: #f1f1f1;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    color: #333;
+    transition: background-color 0.2s ease;
+}
+
+.pagination-container button.active,
+.pagination-container button:hover {
+    background-color: #0071e3;
+    color: white;
+}
+
+@media (max-width: 768px) {
+    main {
+        margin: 40px 16px;
+        padding: 24px 16px;
+    }
+
+    .order-table thead {
+        display: none;
+    }
+
+    .order-table, .order-table tbody, .order-table tr, .order-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .order-table td {
+        padding: 12px 16px;
+        border-bottom: 1px solid #eee;
+        position: relative;
+    }
+
+    .order-table td::before {
+        content: attr(data-label);
+        font-weight: bold;
+        color: #555;
+        display: block;
+        margin-bottom: 6px;
+    }
+}

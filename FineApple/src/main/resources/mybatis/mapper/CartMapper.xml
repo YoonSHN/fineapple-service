@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fineapple.domain.user.repository.CartMapper">
+
+    <resultMap id="cartItemResultMap" type="CartItem">
+        <id column="cart_item_id" property="cartItemId"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+        <result column="quantity" property="quantity"/>
+        <result column="cart_item_id" property="cart_itemId"/>
+        <result column="user_id" property="userId"/>
+    </resultMap>
+
+    <resultMap id="cartResultMap" type="com.fineapple.domain.user.dto.CartDto">
+        <result property="cartId" column="cart_id"/>
+        <result property="userId" column="user_id"/>
+    </resultMap>
+
+    <!--    <resultMap id="cartItemDtoResultMap" type="com.fineapple.domain.user.dto.CartItemDto">-->
+    <!--        <result column="cart_id" property="cartId"/>-->
+    <!--        <result column="quantity" property="quantity"/>-->
+    <!--        <result column="name" property="productName"/>-->
+    <!--        <result column="price" property="productPrice"/>-->
+    <!--        <result column="image_url" property="productUrl"/>-->
+    <!--    </resultMap>-->
+
+    <delete id="deleteCartByUserId" parameterType="long">
+        DELETE
+        FROM CartItem
+        WHERE user_id = #{userId}
+    </delete>
+
+
+    <delete id="deleteCartByProductId" parameterType="long">
+        DELETE
+        FROM CartItem
+        WHERE product_id = #{productId}
+    </delete>
+
+
+    <delete id="deleteCart" parameterType="long">
+        DELETE
+        FROM Cart
+        WHERE cart_id = #{cartId}
+    </delete>
+
+
+    <insert id="insertCartItem" parameterType="com.fineapple.domain.user.dto.CartItemDto">
+        INSERT INTO CartItem (quantity, cart_id, product_id, options)
+        VALUES (#{quantity}, #{cartId}, #{productId},
+                IFNULL(#{optionsJson}, '{}'))
+    </insert>
+
+
+    <select id="findCartItemByProductId" parameterType="map" resultType="com.fineapple.domain.user.dto.CartItemDto">
+        SELECT cart_id    AS cartId,
+               product_id AS productId,
+               quantity,
+               options    AS options
+        FROM CartItem
+        WHERE cart_id = #{cartId}
+          AND product_id = #{productId}
+    </select>
+
+
+    <update id="updateCartItemQuantity" parameterType="map">
+        UPDATE CartItem
+        SET quantity = quantity + #{quantity}
+        WHERE product_id = #{productId}
+    </update>
+
+    <update id="updateCartItem" parameterType="map">
+        UPDATE CartItem
+        SET quantity = #{quantity}
+        WHERE product_id = #{productId}
+          and cart_id = #{cartId}
+    </update>
+
+
+    <select id="findByUserId" parameterType="long" resultType="com.fineapple.domain.user.dto.CartDto">
+        SELECT cart_id as cartId, user_id as userId
+        FROM Cart
+        WHERE user_id = #{userId}
+    </select>
+
+    <select id="findByGuestId" parameterType="long" resultType="com.fineapple.domain.user.dto.CartDto">
+        SELECT cart_id as cartId, guest_id as userId
+        FROM Cart
+        where guest_id = #{guestId}
+    </select>
+
+
+    <insert id="insertCart" parameterType="long">
+        INSERT INTO Cart (user_id)
+        VALUES (#{userId})
+    </insert>
+    <insert id="insertCartGuest" parameterType="long">
+        INSERT INTO Cart (guest_id)
+        VALUES (#{userId})
+    </insert>
+
+
+    <!-- 1(true) 비회원  0(false) 회원   -->
+    <select id="isGuest" parameterType="long" resultType="java.lang.Boolean">
+        SELECT CASE
+                   WHEN EXISTS (SELECT 1 FROM User WHERE user_id = #{userId}) THEN 0
+                   ELSE 1
+                   END
+    </select>
+
+    <select id="findCartItems" parameterType="long" resultType="com.fineapple.domain.user.dto.CartItemDto">
+        SELECT ci.cart_id    AS cartId,
+               ci.quantity   AS quantity,
+               ci.options    AS optionsJson,
+               pi.image_url  AS productUrl,
+               p.name        AS productName,
+               p.price       AS productPrice,
+               ci.product_id AS productId
+        FROM CartItem ci
+                 JOIN Product p ON ci.product_id = p.product_id
+                 JOIN Product_Image pi ON ci.product_id = pi.product_id
+            AND pi.product_main = 1
+        WHERE ci.cart_id = #{cartId}
+    </select>
+
+</mapper>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fineapple.domain.user.repository.UserHistoryMapper">
+
+    <select id="searchUserProfileHistory"
+            parameterType="com.fineapple.domain.user.dto.UserProfileHistorySearchParam"
+            resultType="com.fineapple.domain.user.dto.UserProfileHistoryDto">
+        SELECT
+        profilehistory_id AS profileHistoryId,
+        user_id AS userId,
+        field_changed AS fieldChanged,
+        previous_value AS previousValue,
+        new_value AS newValue,
+        changed_by AS changedBy,
+        changed_at AS changedAt
+        FROM UserProfileHistory
+        WHERE 1=1
+        <if test="userId != null and userId != ''">
+            AND user_id = #{userId}
+        </if>
+        <if test="fieldChanged != null and fieldChanged != ''">
+            AND field_changed LIKE CONCAT('%', #{fieldChanged}, '%')
+        </if>
+        <if test="startDate != null">
+            AND DATE(changed_at) <![CDATA[ >= ]]> #{startDate}
+        </if>
+        <if test="endDate != null">
+            AND DATE(changed_at) <![CDATA[ <= ]]> #{endDate}
+        </if>
+        ORDER BY changed_at DESC
+    </select>
+
+
+    <select id="searchLoginHistory"
+            parameterType="com.fineapple.domain.user.dto.LoginHistorySearchParam"
+            resultType="com.fineapple.domain.user.dto.LoginHistoryDto">
+        SELECT
+        loginhistory_id AS loginHistoryId,
+        user_id AS userId,
+        login_time AS loginTime,
+        ip_address AS ipAddress,
+        device_info AS deviceInfo,
+        login_status AS loginStatus
+        FROM LoginHistory
+        WHERE 1=1
+        <if test="userId != null and userId != ''">
+            AND user_id = #{userId}
+        </if>
+        <if test="ipAddress != null and ipAddress != ''">
+            AND ip_address LIKE CONCAT('%', #{ipAddress}, '%')
+        </if>
+        <if test="loginStatus != null and loginStatus != ''">
+            AND login_status = #{loginStatus}
+        </if>
+        <if test="startDate != null">
+            AND DATE(login_time) <![CDATA[ >= ]]> #{startDate}
+        </if>
+        <if test="endDate != null">
+            AND DATE(login_time) <![CDATA[ <= ]]> #{endDate}
+        </if>
+        ORDER BY login_time DESC
+    </select>
+
+    <select id="countUserWeekday" parameterType="Map" resultType="int">
+        SELECT COUNT(*)
+        FROM LoginHistory
+        WHERE login_time <![CDATA[ >= ]]> #{startDate}
+          AND login_time <![CDATA[ < ]]> #{endDate}
+    </select>
+
+
+</mapper>

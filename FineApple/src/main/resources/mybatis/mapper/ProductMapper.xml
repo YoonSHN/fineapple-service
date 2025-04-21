@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fineapple.domain.product.repository.ProductMapper">
+
+
+    <resultMap id="productWithOptionsMap"
+               type="com.fineapple.domain.product.dto.ProductAdminDto">
+        <id property="productId"       column="productId"/>
+        <result property="productName" column="productName"/>
+        <result property="description" column="description"/>
+        <result property="price"       column="price"/>
+        <result property="isActive"    column="isActive"/>
+        <result property="createdAt"   column="createdAt"/>
+        <result property="updatedAt"   column="updatedAt"/>
+        <result property="categoryName" column="category_name"/>
+
+        <collection property="options"
+                    ofType="com.fineapple.domain.product.dto.ProductOptionDto">
+            <id property="optionId"        column="optionId"/>
+            <result property="optionName"  column="optionName"/>
+            <result property="optionValue" column="optionValue"/>
+            <result property="additionalPrice" column="additionalPrice"/>
+            <result property="productId"   column="OptionProductId"/>
+        </collection>
+    </resultMap>
+
+    <!--    단건조회-->
+    <resultMap id="productDetailResultMap" type="com.fineapple.domain.product.dto.ProductDetailDto">
+        <id property="productId" column="product_id"/>
+        <result property="imageUrl" column="image_url"/>
+        <result property="name" column="name"/>
+        <result property="description" column="description"/>
+        <result property="price" column="price"/>
+        <result property="targetReleaseDate" column="target_release_date"/>
+        <result property="saleStartDate" column="sale_start_date"/>
+        <result property="categoryName" column="category_name"/>
+        <result property="isActive" column="is_active"/>
+    </resultMap>
+    <!--    전체조회-->
+    <resultMap id="productListResultMap" type="com.fineapple.domain.product.dto.ProductListDto">
+        <id property="productId" column="product_id"/>
+        <result property="name" column="name"/>
+        <result property="price" column="price"/>
+        <result property="categoryName" column="category_name"/>
+        <result property="imageUrl" column="image_url"/>
+        <result property="saleStatus" column="description"/>
+    </resultMap>
+    <!--    단건조회-->
+    <select id="findProductById" parameterType="long" resultMap="productDetailResultMap">
+        select p.product_id, pi.image_url, p.name, p.description, p.price, p.target_release_date, p.sale_start_date,
+               c.name as category_name, p.is_active
+        from Product p
+                 join Category c on p.category_id = c.category_id
+                 join Product_Image pi on p.product_id = pi.product_id
+        where p.product_id = #{productId} AND pi.product_main IS TRUE
+    </select>
+
+    <!--    전체조회-->
+    <select id="findAllProducts" resultMap="productListResultMap">
+        select p.product_id, p.name, p.price, c.name as category_name,pi.image_url,cc.description
+        from Product p
+                 join Product_Image pi on p.product_id = pi.product_id
+                 join Category c on p.category_id = c.category_id
+                 join CommonCode cc on p.sale_status = cc.code;
+    </select>
+
+    <select id="existsProductById" resultType="boolean" parameterType="long">
+    SELECT EXISTS (
+    SELECT 1
+    FROM Product
+    WHERE product_id = #{productId}
+    )
+    </select>
+
+    <select id="existsCategoryById" resultType="boolean" parameterType="long">
+        SELECT EXISTS(
+            SELECT 1
+            FROM Category
+            WHERE category_id = #{categoryId}
+        )
+    </select>
+
+    <select id="selectAllProduct"
+            parameterType="com.fineapple.domain.product.dto.ProductSearchParam"
+            resultType="com.fineapple.domain.product.dto.ProductAdminDto">
+        SELECT
+        P.product_id       AS productId,
+        P.name             AS productName,
+        P.description,
+        P.price,
+        P.created_at       AS createdAt,
+        P.updated_at       AS updatedAt,
+        P.category_id      AS categoryId,
+        C.name             AS category_name,
+        P.is_active        AS isActive,
+        I.image_url        AS productImageUrl
+        FROM Product P
+        LEFT JOIN Product_Image I
+        ON P.product_id = I.product_id AND I.product_main = TRUE
+        LEFT JOIN Category C ON P.category_id = C.category_id
+        WHERE 1=1
+        <if test="name != null and name != ''">
+            AND P.name = #{name}
+        </if>
+        <if test="isActive != null">
+            AND P.is_active = #{isActive}
+        </if>
+        <if test="saleStatus != null and saleStatus != ''">
+            AND P.sale_status = #{saleStatus}
+        </if>
+        <if test="startDate != null">
+            AND P.created_at &gt;= #{startDate}
+        </if>
+        <if test="endDate != null">
+            AND P.created_at &lt;= #{endDate}
+        </if>
+        <if test="sortDir != null and sortDir.toUpperCase() == 'ASC'">
+            ORDER BY P.created_at ASC
+        </if>
+        <if test="sortDir != null and sortDir.toUpperCase() == 'DESC'">
+            ORDER BY P.created_at DESC
+        </if>
+    </select>
+
+    <select id="selectAllProductWithOption"
+            parameterType="long"
+            resultMap="productWithOptionsMap">
+        SELECT P.product_id       AS productId,
+               P.name             AS productName,
+               P.description      AS description,
+               P.price            AS price,
+               P.created_at       AS createdAt,
+               P.updated_at       AS updatedAt,
+               P.is_active        AS isActive,
+               C.name             AS category_name,
+
+               O.option_id        AS optionId,
+               O.option_name      AS optionName,
+               O.option_value     AS optionValue,
+               O.additional_price AS additionalPrice,
+               O.product_id       AS OptionProductId
+
+        FROM Product P
+                 LEFT JOIN ProductOption O
+                           ON P.product_id = O.product_id
+                 LEFT JOIN Category C
+                           ON P.category_id = C.category_id
+        WHERE P.product_id = #{productId}
+    </select>
+
+    <insert id="insertProduct" parameterType="ProductInsertDto">
+        <selectKey keyProperty="productId" resultType="long" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO Product (
+        name, description, price, category_id, is_active,
+        target_release_date, actual_release_date,
+        sale_start_date, sale_stop_date,
+        sale_restart_date, sale_end_date, sale_status
+        )
+        VALUES (
+        #{name}, #{description}, #{price}, #{categoryId}, #{isActive},
+        #{targetReleaseDate}, #{actualReleaseDate},
+        #{saleStartDate}, #{saleStopDate},
+        #{saleRestartDate}, #{saleEndDate}, #{saleStatus}
+        )
+    </insert>
+
+    <insert id="insertProductOption" parameterType="ProductOptionDto" useGeneratedKeys="true" keyProperty="optionId">
+    INSERT INTO ProductOption (
+    product_id, option_name, option_value, additional_price
+    )
+    VALUES
+    (
+    #{productId}, #{optionName}, #{optionValue}, #{additionalPrice}
+    )
+    </insert>
+
+
+
+    <insert id="insertProductImage" parameterType="ProductImageInsertDto" useGeneratedKeys="true" keyProperty="imageId">
+        INSERT INTO Product_Image (
+            image_url, product_id, alt_text, product_main
+        )
+        VALUES
+        (
+        #{imageUrl}, #{productId}, #{altText}, #{productMain}
+        )
+    </insert>
+
+    <select id="existsMainImage" resultType="boolean" parameterType="long">
+        SELECT EXISTS (
+            SELECT 1
+            FROM Product_Image
+            WHERE product_main = true
+              AND product_id = #{productId}
+        )
+    </select>
+
+    <update id="updateIsActive">
+        UPDATE Product
+        SET is_active = #{isActive}
+        WHERE product_id = #{productId}
+    </update>
+
+    <select id="findOptionById" resultType="ProductOptionDto">
+        SELECT * FROM ProductOption WHERE option_id = #{optionId}
+    </select>
+
+    <delete id="deleteProductOptionById">
+        DELETE FROM ProductOption WHERE option_id = #{optionId}
+    </delete>
+
+    <update id="updateProduct" parameterType="ProductUpdateDto">
+        UPDATE product
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="categoryId != null">category_id = #{categoryId},</if>
+            <if test="isActive != null">is_active = #{isActive},</if>
+            <if test="targetReleaseDate != null">target_release_date = #{targetReleaseDate},</if>
+            <if test="actualReleaseDate != null">actual_release_date = #{actualReleaseDate},</if>
+            <if test="saleStartDate != null">sale_start_date = #{saleStartDate},</if>
+            <if test="saleStopDate != null">sale_stop_date = #{saleStopDate},</if>
+            <if test="saleRestartDate != null">sale_restart_date = #{saleRestartDate},</if>
+            <if test="saleEndDate != null">sale_end_date = #{saleEndDate},</if>
+            <if test="saleStatus != null">sale_status = #{saleStatus},</if>
+        </set>
+        WHERE product_id = #{productId}
+    </update>
+
+    <select id="selectMainImage" resultType="ProductImageInsertDto">
+        SELECT *
+        FROM Product_Image
+        WHERE product_id = #{productId}
+          AND product_main = true
+        LIMIT 1
+    </select>
+
+    <delete id="deleteProductImage">
+        DELETE FROM Product_Image
+        WHERE image_id = #{imageId}
+    </delete>
+
+    <select id="findProductByIdForUpdate" resultType="com.fineapple.domain.product.dto.ProductDetailDto">
+        SELECT
+            p.product_id AS productId,
+            p.name,
+            p.description,
+            p.price,
+            p.is_active AS isActive,
+            c.name,
+            pi.image_url AS imageUrl
+        FROM Product p
+                 LEFT JOIN Category c ON p.category_id = c.category_id
+                 LEFT JOIN Product_Image pi ON p.product_id = pi.product_id AND pi.product_main = true
+        WHERE p.product_id = #{productId}
+            FOR UPDATE
+    </select>
+
+    <select id="selectProductByCategoryId" parameterType="long" resultType="com.fineapple.domain.product.dto.ProductListDto">
+        SELECT
+            p.product_id AS productId,
+            p.name,
+            p.price,
+            c.name AS categoryName,
+            (
+                SELECT pi.image_url
+                FROM Product_Image pi
+                WHERE pi.product_id = p.product_id
+                  AND pi.product_main = TRUE
+                LIMIT 1
+            ) AS imageUrl,
+            p.sale_status
+        FROM Product p
+                 JOIN Category c ON p.category_id = c.category_id
+        WHERE c.category_id = #{categoryId}
+        ORDER BY p.product_id DESC
+    </select>
+
+    <select id="selectProductByCategoryPath" parameterType="string" resultType="com.fineapple.domain.product.dto.ProductListDto">
+        SELECT
+            p.product_id AS productId,
+            p.name,
+            p.price,
+            c.name AS categoryName,
+            (
+                SELECT pi.image_url
+                FROM Product_Image pi
+                WHERE pi.product_id = p.product_id
+                  AND pi.product_main = TRUE
+                LIMIT 1
+            ) AS imageUrl,
+            p.sale_status
+        FROM Product p
+                 JOIN Category c ON p.category_id = c.category_id
+        WHERE c.path = #{path}
+        ORDER BY p.product_id DESC
+    </select>
+
+
+
+
+
+
+</mapper>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fineapple.domain.order_payment.repository.OrderCartMapper">
+
+    <select id="fetchItemsFromGuestCart" resultType="com.fineapple.domain.order_payment.dto.OrderItemDetailUserDto">
+        SELECT DISTINCT ci.product_id,
+               p.name                  AS itemName,
+               ci.quantity             AS itemQuantity,
+               p.price                 AS itemPrice,
+               (ci.quantity * p.price) AS itemTotalPrice
+        FROM Cart c
+                 INNER JOIN CartItem ci ON c.cart_id = ci.cart_id
+                 LEFT JOIN Product p ON ci.product_id = p.product_id
+                 LEFT JOIN Guest g ON c.guest_id = g.guest_id
+        WHERE g.guest_id = #{guestId}
+          AND c.cart_id = #{cartId};
+    </select>
+
+    <select id="fetchItemsFromUserCart" resultType="com.fineapple.domain.order_payment.dto.OrderItemDetailUserDto">
+        SELECT DISTINCT ci.product_id,
+               ci.quantity             AS itemQuantity,
+               p.price                 AS itemPrice,
+               (ci.quantity * p.price) AS itemTotalPrice
+        FROM Cart c
+                 INNER JOIN CartItem ci ON c.cart_id = ci.cart_id
+                 LEFT JOIN Product p ON ci.product_id = p.product_id
+                 LEFT JOIN User u ON c.user_id = u.user_id
+        WHERE u.user_id = #{userId}
+          AND c.cart_id = #{cartId};
+    </select>
+
+
+    <delete id="removeOrderedItemsFromUserCart" parameterType="map">
+        DELETE FROM CartItem
+        WHERE cart_id IN (
+            SELECT c.cart_id
+            FROM Cart c
+            WHERE c.user_id = #{userId}
+        )
+          AND product_id IN
+        <foreach collection="orderItems" item="item" separator="," open="(" close=")">
+            #{item.productId}
+        </foreach>
+    </delete>
+
+    <delete id="removeOrderedItemsFromGuestCart" parameterType="map">
+        DELETE FROM CartItem
+        WHERE cart_id IN (
+            SELECT c.cart_id
+            FROM Cart c
+            WHERE c.guest_id = #{guestId}
+        )
+          AND product_id IN
+        <foreach collection="orderItems" item="item" separator="," open="(" close=")">
+            #{item.productId}
+        </foreach>
+    </delete>
+
+
+</mapper>
