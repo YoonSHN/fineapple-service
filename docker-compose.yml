@@ -1,4 +1,23 @@
 services:
+  spring:
+    build: ./FineApple
+    container_name: spring-server
+    ports:
+      - "8080:8080"
+    networks:
+      - app-net
+    depends_on:
+      - mysql-main
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-main:3306/fineapple
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: 1234
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+      SPRING_PROFILES_ACTIVE: docker
+    volumes:
+      - nginx-upload-data:/app/uploads
+      - spring-logs:/app/logs
+
   mysql-main:
     image: mysql:8.4.3
     container_name: fineapple-main
@@ -46,7 +65,9 @@ services:
       - "80:80"
     volumes:
       - "./nginx/nginx.conf:/etc/nginx/nginx.conf:ro"
-      - "/Users/imhangyu/Pictures/root_FineApple/FineApple/uploads:/usr/share/nginx/html/uploads"
+      - "./nginx/static/uploads:/usr/share/nginx/html/uploads"
+      - "./nginx/static/js:/usr/share/nginx/html/js"
+      - "./nginx/static/css:/usr/share/nginx/html/css"
     networks:
       - app-net
     environment:
@@ -70,6 +91,21 @@ services:
       - app-net
     volumes:
       - elasticsearch-data:/usr/share/elasticsearch/data
+
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:8.12.1
+    container_name: filebeat
+    user: root  # 로그 파일 접근 필요 시 루트 권한 필요
+    volumes:
+      - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/log:/var/log:ro
+      - spring-logs:/app/logs:ro
+    depends_on:
+      - logstash
+    networks:
+      - app-net
 
   logstash:
     image: docker.elastic.co/logstash/logstash:8.12.1
@@ -95,11 +131,13 @@ services:
     networks:
       - app-net
 
+
 volumes:
   mysql_main_data:
   elasticsearch-data:
+  nginx-upload-data:
+  spring-logs:
 
 networks:
   app-net:
     driver: bridge
-

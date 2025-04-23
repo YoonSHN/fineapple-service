@@ -7,7 +7,6 @@ from app.services.message_service import get_recent_messages
 
 logger = logging.getLogger(__name__)
 
-
 async def reconstruct_previous_state(user_id: int) -> Optional[ChatState]:
     logger.info(f"[reconstruct_previous_state] user_id: {user_id}")
 

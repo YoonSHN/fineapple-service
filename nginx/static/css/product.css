@@ -1,0 +1,68 @@
+#item-detail {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    border: 1px solid #ccc;
+    gap: 150px;
+    border-radius: 20px;
+    background: white;
+    padding: 40px;
+    box-sizing: border-box;
+    max-width: 1200px; /* 최대 너비 설정 */
+    margin: auto; /* 화면 중앙 정렬 */
+}
+
+#product-image {
+    flex: 1; /* 이미지 크기 자동 조정 */
+    display: flex;
+    justify-content: center; /* 이미지 중앙 정렬 */
+}
+
+#product-image img {
+    width: 600px; /* 이미지 크기 */
+    height: 500px;
+    object-fit: contain;
+    border-radius: 20px;
+}
+
+#product-info {
+    margin: auto;
+    flex: 1; /* 정보 크기 자동 조정 */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* 좌측 정렬 */
+    gap: 20px;
+    max-width: 500px; /* 정보 영역 최대 너비 */
+}
+
+#product-info p {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+select {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+#add-to-cart {
+    width: 100%;
+    padding: 15px 30px;
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+    background-color: #0071e3;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+#add-to-cart:hover {
+    background-color: #005bb5;
+}
+
+

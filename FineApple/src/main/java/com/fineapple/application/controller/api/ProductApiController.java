@@ -31,7 +31,7 @@ public class ProductApiController {
 
     private ProductService productService;
 
-//    단건조회
+    //    단건조회
     @GetMapping("/{id}")
     public ProductDetailDto getProduct(@PathVariable long id, Principal principal, HttpServletRequest request) {
         String userId = principal != null ? principal.getName() : "Guest"; // guest는 알아서 넣어주세요~
@@ -47,7 +47,7 @@ public class ProductApiController {
         return productService.getProductDetail(id);
     }
 
-//    전체조회
+    //    전체조회
     @GetMapping
     public List<ProductListDto> findAllProduct(){
         return productService.getAllProduct();

@@ -14,6 +14,7 @@ class GraphService:
     def __init__(self):
         self.graph = self._build_graph()
 
+
     def _build_graph(self):
         builder = StateGraph(ChatState)
 

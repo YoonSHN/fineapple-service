@@ -19,6 +19,7 @@ class ChatRequest(BaseModel):
     query: str
     user_id: Optional[int] = None
 
+
 class ChatResponse(BaseModel):
     content: str
     intent: str
