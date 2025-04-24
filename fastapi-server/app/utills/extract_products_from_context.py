@@ -1,3 +1,4 @@
+import logging
 import re
 from typing import List, Dict
 from app.tools.normalize_product import normalize_eng_product_name_to_kor
@@ -37,9 +38,11 @@ def extract_product_names_from_llm_answer(text: str, known_names: List[str]) -> 
     3. 영어일경우 한글로 번역후 캐쉬된 md파일에서 리스트로 뽑아오기
     4. product를 전달
     """
-    candidates = re.findall(r'\b(Fine\w+)\s+(?:Series\s\d+|\d+\s?\w*|\w+)', text)
+    logging.info("[함수 호출됨] extract_product_names_from_llm_answer")
+    candidates = re.findall(r'\b(Fine(?:Phone|Book|Pad|Pods|Watch|Display|Charge|Buds)[A-Za-z0-9]*)\b', text)
 
     raw_candidates = [' '.join(c).strip() for c in candidates]
+    logging.info("이름결과: {}".format(raw_candidates))
 
     # 영어 → 한글 변환
     normalized = [normalize_eng_product_name_to_kor(name) for name in raw_candidates]

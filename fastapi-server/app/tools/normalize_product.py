@@ -21,22 +21,17 @@ def normalize_eng_product_name_to_kor(name: str) -> str:
         "Air": "에어",
     }
 
-    name = name.replace(" ", "")
+    name = re.sub(r"[\s\-]", "", name)  # 공백/하이픈 제거
 
     for eng_prefix, kor_prefix in PREFIX_MAP.items():
         if name.startswith(eng_prefix):
             remain = name[len(eng_prefix):]
 
-
-            tokens = re.findall(r'(?:SE|Pro|Mini|Ultra|Air)|\d+', remain)
-
-            if not tokens:
-                return kor_prefix
-
-
             if remain.startswith("Series"):
                 series_num = re.findall(r'\d+', remain)
                 return f"{kor_prefix} 시리즈 {series_num[0]}" if series_num else f"{kor_prefix} 시리즈"
+
+            tokens = re.findall(r'(?:SE|Pro|Mini|Ultra|Air)|\d+', remain)
 
             model_number = ""
             suffix = ""
@@ -54,6 +49,5 @@ def normalize_eng_product_name_to_kor(name: str) -> str:
                 result += f" {suffix}"
 
             return result.strip()
-
 
     return name
