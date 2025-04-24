@@ -23,6 +23,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ isOpen, onClose, isLoggedIn, on
       timestamp: new Date(),
     },
   ]);
+  const [isBotTyping, setIsBotTyping] = useState(false);
   const [showComparison, setShowComparison] = useState(false);
   const [showRecommendation, setShowRecommendation] = useState(false);
   const [comparisonProducts, setComparisonProducts] = useState<Product[]>([]);
@@ -36,6 +37,15 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ isOpen, onClose, isLoggedIn, on
       timestamp: new Date(),
     };
     setMessages((prev) => [...prev, userMessage]);
+
+    setIsBotTyping(true);
+    // const loadingMessage: MessageType = {
+    //   id: 'loading',
+    //   content: '답변 중입니다...',
+    //   sender: 'bot',
+    //   timestamp: new Date(),
+    // };
+    // setMessages((prev) => [...prev, loadingMessage]);
 
     try {
       const res = await fetch('http://localhost:8000/api/chat', {
@@ -54,13 +64,14 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ isOpen, onClose, isLoggedIn, on
 
       const data = await res.json();
 
-      const botMessage: MessageType = {
-        id: (Date.now() + 1).toString(),
-        content: data.content,
-        sender: 'bot',
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, botMessage]);
+      setMessages((prev) =>
+          prev.filter((msg) => msg.id !== 'loading').concat({
+            id: (Date.now() + 1).toString(),
+            content: data.content,
+            sender: 'bot',
+            timestamp: new Date(),
+          })
+      );
 
       if (data.type === 'comparison' && Array.isArray(data.products)) {
         setComparisonProducts(data.products);
@@ -70,46 +81,49 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ isOpen, onClose, isLoggedIn, on
         setShowRecommendation(true);
       }
     } catch (err: any) {
-      const errorMessage: MessageType = {
-        id: (Date.now() + 2).toString(),
-        content: err.message,
-        sender: 'bot',
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, errorMessage]);
+      setMessages((prev) =>
+          prev.filter((msg) => msg.id !== 'loading').concat({
+            id: (Date.now() + 2).toString(),
+            content: err.message,
+            sender: 'bot',
+            timestamp: new Date(),
+          })
+      );
     }
+
+    setIsBotTyping(false);
   };
 
   return (
-    <>
-      <div
-        className={cn(
-          'fixed bottom-24 right-6 w-[350px] sm:w-[400px] rounded-2xl bg-white shadow-xl',
-          'flex flex-col border border-gray-200 transition-all duration-300 ease-in-out z-40',
-          'overflow-hidden',
-          isOpen
-            ? 'opacity-100 transform-none max-h-[600px]'
-            : 'opacity-0 translate-y-10 max-h-0 pointer-events-none'
-        )}
-      >
-        <ChatHeader onClose={onClose} onLogout={onLogout} />
-        <ChatMessages messages={messages} />
-        <MessageInput
-          onSendMessage={handleSendMessage}
-          isOpen={isOpen}
-          isLoggedIn={isLoggedIn}
-        />
-      </div>
+      <>
+        <div
+            className={cn(
+                'fixed bottom-24 right-6 w-[350px] sm:w-[400px] rounded-2xl bg-white shadow-xl',
+                'flex flex-col border border-gray-200 transition-all duration-300 ease-in-out z-40',
+                'overflow-hidden',
+                isOpen
+                    ? 'opacity-100 transform-none max-h-[600px]'
+                    : 'opacity-0 translate-y-10 max-h-0 pointer-events-none'
+            )}
+        >
+          <ChatHeader onClose={onClose} onLogout={onLogout} />
+          <ChatMessages messages={messages} isBotTyping={isBotTyping} />
+          <MessageInput
+              onSendMessage={handleSendMessage}
+              isOpen={isOpen}
+              isLoggedIn={isLoggedIn}
+          />
+        </div>
 
-      <ChatModals
-        showComparison={showComparison}
-        showRecommendation={showRecommendation}
-        onCloseComparison={() => setShowComparison(false)}
-        onCloseRecommendation={() => setShowRecommendation(false)}
-        comparisonProducts={comparisonProducts}
-        recommendationProducts={recommendationProducts}
-      />
-    </>
+        <ChatModals
+            showComparison={showComparison}
+            showRecommendation={showRecommendation}
+            onCloseComparison={() => setShowComparison(false)}
+            onCloseRecommendation={() => setShowRecommendation(false)}
+            comparisonProducts={comparisonProducts}
+            recommendationProducts={recommendationProducts}
+        />
+      </>
   );
 };
 

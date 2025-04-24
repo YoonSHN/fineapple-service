@@ -5,7 +5,7 @@ services:
     ports:
       - "8080:8080"
     networks:
-      - app-net
+      - backend-net
     depends_on:
       - mysql-main
     environment:
@@ -29,7 +29,7 @@ services:
     ports:
       - "3306:3306"
     networks:
-      - app-net
+      - backend-net
     volumes:
       - mysql_main_data:/var/lib/mysql
 
@@ -39,7 +39,7 @@ services:
     ports:
       - "8000:8000"
     networks:
-      - app-net
+      - backend-net
     depends_on:
       - mysql-main
     environment:
@@ -50,7 +50,7 @@ services:
     container_name: batch-job
     command: ["python", "predict_batch.py"]
     networks:
-      - app-net
+      - backend-net
     depends_on:
       - fastapi
       - mysql-main
@@ -69,18 +69,18 @@ services:
       - "./nginx/static/js:/usr/share/nginx/html/js"
       - "./nginx/static/css:/usr/share/nginx/html/css"
     networks:
-      - app-net
+      - frontend-net
+      - backend-net
     environment:
       HOSTNAME: nginx-server
-
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.12.1
     container_name: elasticsearch
     environment:
-      - discovery.type=single-node # 기본적으로 클러스터를 자동구현하지만 불필요
+      - discovery.type=single-node
       - xpack.security.enabled=false
-      - ES_JAVA_OPTS=-Xms512m -Xmx512m # 기본설정이 너무 용량이 크기때문에 줄임
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
     ulimits:
       memlock:
         soft: -1
@@ -88,14 +88,14 @@ services:
     ports:
       - "9200:9200"
     networks:
-      - app-net
+      - elk-net
     volumes:
       - elasticsearch-data:/usr/share/elasticsearch/data
 
   filebeat:
     image: docker.elastic.co/beats/filebeat:8.12.1
     container_name: filebeat
-    user: root  # 로그 파일 접근 필요 시 루트 권한 필요
+    user: root
     volumes:
       - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
@@ -105,7 +105,8 @@ services:
     depends_on:
       - logstash
     networks:
-      - app-net
+      - elk-net
+      - backend-net
 
   logstash:
     image: docker.elastic.co/logstash/logstash:8.12.1
@@ -117,7 +118,7 @@ services:
     depends_on:
       - elasticsearch
     networks:
-      - app-net
+      - elk-net
 
   kibana:
     image: docker.elastic.co/kibana/kibana:8.12.1
@@ -129,8 +130,7 @@ services:
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
     networks:
-      - app-net
-
+      - elk-net
 
 volumes:
   mysql_main_data:
@@ -139,5 +139,6 @@ volumes:
   spring-logs:
 
 networks:
-  app-net:
-    driver: bridge
+  frontend-net:
+  backend-net:
+  elk-net:

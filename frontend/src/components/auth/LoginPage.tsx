@@ -74,7 +74,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
         </svg>
       </div>
 
-      <h1 className="text-2xl font-bold text-center mb-6">Pineapple 로그인</h1>
+      <h1 className="text-2xl font-bold text-center mb-6">Fineapple 로그인</h1>
 
       {error && (
         <div className="text-red-600 text-sm mb-4 text-center">
