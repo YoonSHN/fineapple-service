@@ -18,3 +18,5 @@ def call_solar(prompt: str) -> BaseMessage:
     except Exception as e:
         logger.exception("LLM 호출 실패")
         return BaseMessage(content="LLM 호출 중 오류 발생")
+
+

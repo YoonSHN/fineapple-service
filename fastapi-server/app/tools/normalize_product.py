@@ -1,6 +1,4 @@
-import logging
 import re
-from typing import List
 
 def normalize_eng_product_name_to_kor(name: str) -> str:
     PREFIX_MAP = {
@@ -9,36 +7,53 @@ def normalize_eng_product_name_to_kor(name: str) -> str:
         "FinePad": "파인패드",
         "FineWatch": "파인워치",
         "FinePods": "파인팟",
-        "FineBuds": "파인팟",  # LLM이 잘못 부를 수 있음
+        "FineBuds": "파인팟",
         "FineDisplay": "파인디스플레이",
-        "FineCharge": "파인차지",  # 충전기류 대응
+        "FineCharge": "파인차지",
         "iFine": "아이파인",
     }
 
     SUFFIX_MAP = {
-        "Pro": "Pro",
+        "Pro": "프로",
         "Mini": "미니",
         "Ultra": "울트라",
         "SE": "SE",
+        "Air": "에어",
     }
 
-    name.replace(" ", "")
+    name = name.replace(" ", "")
+
     for eng_prefix, kor_prefix in PREFIX_MAP.items():
         if name.startswith(eng_prefix):
-            remain = name[len(eng_prefix):].strip()
-            tokens = remain.split()
+            remain = name[len(eng_prefix):]
+
+
+            tokens = re.findall(r'(?:SE|Pro|Mini|Ultra|Air)|\d+', remain)
 
             if not tokens:
                 return kor_prefix
 
-            first = tokens[0]
-            suffix = " ".join(tokens[1:]) if len(tokens) > 1 else ""
-            kor_suffix = SUFFIX_MAP.get(first, first)
 
-            # Series는 특수 처리
-            if first == "Series" and len(tokens) > 1:
-                return f"{kor_prefix} 시리즈 {tokens[1]}"
+            if remain.startswith("Series"):
+                series_num = re.findall(r'\d+', remain)
+                return f"{kor_prefix} 시리즈 {series_num[0]}" if series_num else f"{kor_prefix} 시리즈"
 
-            return f"{kor_prefix} {kor_suffix}".strip()
+            model_number = ""
+            suffix = ""
+
+            for token in tokens:
+                if token.isdigit():
+                    model_number = token
+                elif token in SUFFIX_MAP:
+                    suffix = SUFFIX_MAP[token]
+
+            result = kor_prefix
+            if model_number:
+                result += f" {model_number}"
+            if suffix:
+                result += f" {suffix}"
+
+            return result.strip()
+
 
     return name

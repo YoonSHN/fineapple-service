@@ -8,7 +8,7 @@ from app.api.chat_router import router as chat_router
 from app.api.auth_router import router as auth_router
 from dotenv import load_dotenv
 import logging
-
+from app.database.db import database
 
 logger = logging.getLogger(__name__)
 load_dotenv()
@@ -46,6 +46,15 @@ async def global_exception_handler(request: Request, err: Exception):
         status_code=500,
         content={"detail": "서버 내부 오류가 발생했습니다. 잠시 후 다시 시도해주세요."},
     )
+
+@app.on_event("startup")
+async def startup():
+    await database.connect()
+
+@app.on_event("shutdown")
+async def shutdown():
+    await database.disconnect()
+
 
 @app.get("/me")
 def get_me(request: Request):

@@ -8,6 +8,17 @@ from app.tools.chat_tools import (
     class_intent_tool,
     retrieve_relevant_docs,
     generate_response_tool,
+    process_chat_tool,
+    cart_tool,
+    delivery_tool,
+    delivery_tool_rag,
+    event_tool,
+    refund_tool,
+    recommendation_tool,
+    product_inquiry_tool,
+    fallback_tool,
+    payment_tool,
+    user_info_tool,
 )
 
 logger = logging.getLogger(__name__)
@@ -68,3 +79,43 @@ async def generate_answer(state: ChatState) -> ChatState:
     answer = await generate_response_tool(state)
     logger.info(f"[generate_answer] 응답 생성 완료 - 길이: {len(answer)}")
     return state.copy(update={"answer": answer})
+
+async def run_cart_tool(state: ChatState) -> ChatState:
+    logger.info(f"[run_cart_tool] intent: {state.intent} - 장바구니 처리 시작")
+    return await cart_tool(state)
+
+async def run_delivery_tool(state: ChatState) -> ChatState:
+    logger.info(f"[run_delivery_tool] intent: {state.intent} - 배송조회 처리 시작")
+    return await delivery_tool(state)
+
+async def run_delivery_tool_rag(state: ChatState) -> ChatState:
+    logger.info(f"[run_delivery_tool_rag] intent: {state.intent} - 배송문의(RAG) 처리 시작")
+    return await delivery_tool_rag(state)
+
+async def run_event_tool(state: ChatState) -> ChatState:
+    logger.info(f"[run_event_tool] intent: {state.intent} - 이벤트 처리 시작")
+    return await event_tool(state)
+
+async def run_refund_tool(state: ChatState) -> ChatState:
+    logger.info(f"[run_refund_tool] intent: {state.intent} - 환불 요청 처리 시작")
+    return await refund_tool(state)
+
+async def run_recommendation_tool(state: ChatState) -> ChatState:
+    logger.info(f"[run_recommendation_tool] intent: {state.intent} - 상품 추천 처리 시작")
+    return await recommendation_tool(state)
+
+async def run_product_inquiry_tool(state: ChatState) -> ChatState:
+    logger.info(f"[run_product_inquiry_tool] intent: {state.intent} - 상품 문의 처리 시작")
+    return await product_inquiry_tool(state)
+
+async def run_payment_tool(state: ChatState) -> ChatState:
+    logger.info(f"[run_payment_tool] intent: {state.intent} - 결제 처리 시작")
+    return await payment_tool(state)
+
+async def run_user_info_tool(state: ChatState) -> ChatState:
+    logger.info(f"[run_user_info_tool] intent: {state.intent} - 사용자 정보 처리 시작")
+    return await user_info_tool(state)
+
+async def run_fallback_tool(state: ChatState) -> ChatState:
+    logger.info(f"[run_fallback_tool] intent: {state.intent} - fallback 처리 시작")
+    return await fallback_tool(state)

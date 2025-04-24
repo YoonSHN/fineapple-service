@@ -4,6 +4,15 @@ from dotenv import load_dotenv
 from app.models.chat import ChatRequest, ChatState
 from app.services.LLMService import LLMService
 from app.utills.crc_chain import crc_chain, memory
+from app.nodes.cart import cart_node
+from app.nodes.delivery import delivery_node, delivery_node_rag
+from app.nodes.refund import refund_node
+from app.nodes.recommendation import recommendation_node
+from app.nodes.product_inquiry import product_inquiry_node
+from app.nodes.event import event_node
+from app.nodes.fallback_node import fallback_node
+from app.nodes.payment import payment_node
+from app.nodes.user_info import user_info_node
 
 load_dotenv()
 
@@ -58,3 +67,44 @@ async def process_chat_tool(question: str, user_id: Optional[int] = None) -> dic
     request = ChatRequest(query=question, user_id=user_id)
     response = await controller.process_chat(request)
     return response.model_dump()
+
+
+@mcp.tool()
+async def cart_tool(state: ChatState) -> ChatState:
+    return await cart_node(state)
+
+@mcp.tool()
+async def delivery_tool(state: ChatState) -> ChatState:
+    return await delivery_node_rag(state)
+
+@mcp.tool()
+async def delivery_tool_rag(state: ChatState) -> ChatState:
+    return await delivery_node(state)
+
+@mcp.tool()
+async def event_tool(state: ChatState) -> ChatState:
+    return await event_node(state)
+
+@mcp.tool()
+async def refund_tool(state: ChatState) -> ChatState:
+    return await refund_node(state)
+
+@mcp.tool()
+async def recommendation_tool(state: ChatState) -> ChatState:
+    return await recommendation_node(state)
+
+@mcp.tool()
+async def product_inquiry_tool(state: ChatState) -> ChatState:
+    return await product_inquiry_node(state)
+
+@mcp.tool()
+async def fallback_tool(state: ChatState) -> ChatState:
+    return await fallback_node(state)
+
+@mcp.tool()
+async def payment_tool(state: ChatState) -> ChatState:
+    return await payment_node(state)
+
+@mcp.tool()
+async def user_info_tool(state: ChatState) -> ChatState:
+    return await user_info_node(state)

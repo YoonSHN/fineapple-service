@@ -25,3 +25,5 @@ langsmith
 prophet
 mcp
 pydantic[email]
+databases
+aiomysql
