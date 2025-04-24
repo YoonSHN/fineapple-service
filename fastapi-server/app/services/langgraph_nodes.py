@@ -3,6 +3,7 @@ from app.models.chat import ChatState
 from app.utills.extract import extract_order_code
 from app.services.order_service import get_user_orders, get_order_details
 from app.database.session import get_db
+from app.utills.remove_status_codes import remove_status_codes
 
 from app.tools.chat_tools import (
     class_intent_tool,
@@ -77,8 +78,10 @@ async def generate_answer(state: ChatState) -> ChatState:
         logger.debug(f"[generate_answer] 주문 정보 포함됨")
 
     answer = await generate_response_tool(state)
+
+    cleaned_answer = remove_status_codes(answer)
     logger.info(f"[generate_answer] 응답 생성 완료 - 길이: {len(answer)}")
-    return state.copy(update={"answer": answer})
+    return state.copy(update={"answer": cleaned_answer})
 
 async def run_cart_tool(state: ChatState) -> ChatState:
     logger.info(f"[run_cart_tool] intent: {state.intent} - 장바구니 처리 시작")

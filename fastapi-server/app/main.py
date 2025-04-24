@@ -6,9 +6,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.predict_router import router as predict_router
 from app.api.chat_router import router as chat_router
 from app.api.auth_router import router as auth_router
+from app.api.recommend_router import router as recommend_router
 from dotenv import load_dotenv
 import logging
 from app.database.db import database
+
 
 logger = logging.getLogger(__name__)
 load_dotenv()
@@ -35,6 +37,7 @@ app.add_middleware(
 app.include_router(chat_router, prefix="/api")
 app.include_router(auth_router)
 app.include_router(predict_router)
+app.include_router(recommend_router)
 # app.include_router(agent_router, prefix="/api") #미사용
 
 

@@ -3,6 +3,7 @@ package com.fineapple.application.controller.api;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fineapple.application.common.CartUserIdProvider;
 import com.fineapple.domain.product.dto.AdminProductDetailDto;
 import com.fineapple.domain.product.dto.ProductDetailDto;
 import com.fineapple.domain.product.dto.ProductListDto;
@@ -30,11 +31,12 @@ import java.util.Map;
 public class ProductApiController {
 
     private ProductService productService;
-
+    private CartUserIdProvider cartUserIdProvider;
     //    단건조회
     @GetMapping("/{id}")
-    public ProductDetailDto getProduct(@PathVariable long id, Principal principal, HttpServletRequest request) {
-        String userId = principal != null ? principal.getName() : "Guest"; // guest는 알아서 넣어주세요~
+    public ProductDetailDto getProduct(@PathVariable long id, @AuthenticationPrincipal User user, HttpServletRequest request) {
+//        String userId = principal != null ? principal.getName() : "Guest"; // guest는 알아서 넣어주세요~
+        Long userId = cartUserIdProvider.resolveUserId(user,request);
         MDC.put("userId", userId);
         MDC.put("productId", String.valueOf(id));
         MDC.put("action", "view");

@@ -27,3 +27,8 @@ mcp
 pydantic[email]
 databases
 aiomysql
+elastic-transport==8.17.1
+elasticsearch==8.17.1
+mysql-connector-python
+scikit-learn
+scipy
