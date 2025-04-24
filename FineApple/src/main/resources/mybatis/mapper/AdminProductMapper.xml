@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+
+<mapper namespace="com.fineapple.domain.product.repository.ProductMapper">
+    <!--    관리자단건조회-->
+    <resultMap id="adminProductDetailResultMap" type="com.fineapple.domain.product.dto.AdminProductDetailDto">
+        <result property="productId" column="product_id" />
+        <result property="productImage" column="image_url" />
+        <result property="name" column="name" />
+        <result property="description" column="description" />
+        <result property="price" column="price" />
+        <result property="createdAt" column="created_at" />
+        <result property="updatedAt" column="updated_at" />
+        <result property="categoryName" column="categoryName" />
+        <result property="isActive" column="is_active" />
+        <result property="targetReleaseDate" column="target_release_date" />
+        <result property="actualReleaseDate" column="actual_release_date" />
+        <result property="saleStartDate" column="sale_start_date" />
+        <result property="saleStopDate" column="sale_stop_date" />
+        <result property="saleRestartDate" column="sale_restart_date" />
+        <result property="saleEndDate" column="sale_end_date" />
+        <result property="saleStatus" column="saleStatus" />
+    </resultMap>
+
+<!--    관리자단건조회-->
+    <select id="findAdminProductById" parameterType="long" resultMap="adminProductDetailResultMap">
+        select p.product_id,pi.image_url,p.name,p.description,p.price, p.created_at,p.updated_at,c.name as categoryName,p.is_active,p.target_release_date,p.actual_release_date,p.sale_start_date,p.sale_stop_date,p.sale_restart_date,p.sale_end_date,cc.description as saleStatus
+        from Product p
+        join Product_Image pi on p.product_id = pi.product_id
+        join Category c on p.category_id = c.category_id
+        join CommonCode cc on p.sale_status = cc.code
+        where p.product_id = #{id}
+    </select>
+
+
+
+</mapper>

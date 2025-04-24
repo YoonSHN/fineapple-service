@@ -1,0 +1,406 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fineapple.domain.order_payment.repository.OrdersMapper">
+
+    <select id="selectOrderById" resultType="Orders">
+        SELECT order_id       AS orderId,
+               created_at     AS createdAt,
+               updated_at     AS updatedAt,
+               order_code     AS orderCode,
+               total_price    AS totalPrice,
+               discount_price AS discountPrice,
+               is_cancelled   AS isCancelled,
+               delivery_id    AS deliveryId,
+               guest_id       AS guestId,
+               user_id        AS userId,
+               order_status   AS orderStatus,
+               payment_method AS paymentMethod
+        FROM Orders
+        WHERE order_id = #{orderId}
+    </select>
+
+    <!--변경예정 -->
+    <insert id="insertOrder" parameterType="Orders">
+        INSERT INTO Orders (created_at, updated_at, order_code, total_price, discount_price, is_cancelled, delivery_id,
+        guest_id, user_id, order_status, payment_method)
+        VALUES ( #{createdAt}, #{updatedAt}, #{orderCode}, #{totalPrice}, #{discountPrice}, #{isCancelled},
+        #{deliveryId}, #{guestId}, #{userId}, #{orderStatus}, #{paymentMethod})
+        <selectKey keyProperty="id" order="AFTER" resultType="long">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+    <!--변경예정 -->
+    <update id="updateOrder" parameterType="Orders">
+        UPDATE Orders
+        SET user_id      = #{userId},
+            order_status = #{orderStatus}
+        WHERE order_id = #{orderId}
+    </update>
+
+    <select id="existsOrderById" resultType="boolean" parameterType="long">
+        SELECT EXISTS (
+            SELECT 1
+            FROM Orders
+            WHERE order_id = #{orderId}
+        )
+    </select>
+
+    <select id="existsOrderItemDetailById" resultType="boolean" parameterType="long">
+        SELECT EXISTS (
+            SELECT 1
+            FROM OrderItemDetail
+            WHERE orderitemdetail_id = #{orderItemDetailId}
+        )
+    </select>
+
+    <select id="existsRefundById" resultType="boolean" parameterType="long">
+        SELECT EXISTS (
+            SELECT 1
+            FROM Refund
+            WHERE refund_id = #{refundId}
+        )
+    </select>
+
+    <select id="selectAllOrders" parameterType="OrderSearchParam"
+            resultType="OrderAllDto">
+        SELECT
+        o2.order_id AS orderId,
+        o2.order_code AS orderCode,
+        o2.total_price AS totalPrice,
+        o2.order_status AS orderStatus,
+        o2.is_cancelled AS isCancelled,
+        o2.created_at AS createdAt,
+        o2.updated_at AS updatedAt,
+        CASE
+        WHEN o2.user_id IS NOT NULL THEN u.tel
+        WHEN o2.guest_id IS NOT NULL THEN g.tel
+        ELSE NULL
+        END AS tel
+        FROM (
+        SELECT o.order_id
+        FROM Orders o
+        <choose>
+            <when test="tel != null and tel != ''">
+                LEFT JOIN UserInfo u ON o.user_id = u.user_id
+                LEFT JOIN Guest g ON o.guest_id = g.guest_id
+            </when>
+        </choose>
+        WHERE 1 = 1
+        <if test="orderStatus != null and orderStatus != ''">
+            AND o.order_status = #{orderStatus}
+        </if>
+        <if test="isCancelled != null and isCancelled != ''">
+            AND o.is_cancelled = #{isCancelled}
+        </if>
+        <if test="startDate != null">
+            AND o.created_at <![CDATA[ >= ]]> #{startDate}
+        </if>
+        <if test="endDate != null">
+            AND o.created_at <![CDATA[ <= ]]> #{endDate}
+        </if>
+        <if test="orderId != null and orderId != ''">
+            AND o.order_id = #{orderId}
+        </if>
+        <if test="orderCode != null and orderCode != ''">
+            AND o.order_code LIKE CONCAT(#{orderCode}, '%')
+        </if>
+        <if test="tel != null and tel != ''">
+            AND (
+            (u.tel IS NOT NULL AND u.tel LIKE CONCAT(#{tel}, '%'))
+            OR (g.tel IS NOT NULL AND g.tel LIKE CONCAT(#{tel}, '%'))
+            )
+        </if>
+        ORDER BY o.created_at
+        <choose>
+            <when test="sortDir != null and sortDir.toLowerCase().equals('asc')">
+                ASC
+            </when>
+            <otherwise>
+                DESC
+            </otherwise>
+        </choose>
+        LIMIT #{offset}, #{pageSize}
+        ) AS tmp
+        JOIN Orders o2 ON o2.order_id = tmp.order_id
+        LEFT JOIN UserInfo u ON o2.user_id = u.user_id
+        LEFT JOIN Guest g ON o2.guest_id = g.guest_id
+    </select>
+
+
+
+
+
+    <select id="countAllOrders" parameterType="OrderSearchParam" resultType="int">
+        SELECT COUNT(*)
+        FROM Orders o
+        <choose>
+            <when test="tel != null and tel != ''">
+                LEFT JOIN UserInfo u ON o.user_id = u.user_id
+                LEFT JOIN Guest g ON o.guest_id = g.guest_id
+            </when>
+        </choose>
+        WHERE 1 = 1
+        <if test="orderStatus != null and orderStatus != ''">
+            AND o.order_status = #{orderStatus}
+        </if>
+        <if test="isCancelled != null and isCancelled != ''">
+            AND o.is_cancelled = #{isCancelled}
+        </if>
+        <if test="startDate != null">
+            AND o.created_at <![CDATA[ >= ]]> #{startDate}
+        </if>
+        <if test="endDate != null">
+            AND o.created_at <![CDATA[ <= ]]> #{endDate}
+        </if>
+        <if test="orderId != null and orderId != ''">
+            AND o.order_id = #{orderId}
+        </if>
+        <if test="orderCode != null and orderCode != ''">
+            AND o.order_code LIKE CONCAT(#{orderCode}, '%')
+        </if>
+        <if test="tel != null and tel != ''">
+            AND (
+            (u.tel IS NOT NULL AND u.tel LIKE CONCAT(#{tel}, '%'))
+            OR (g.tel IS NOT NULL AND g.tel LIKE CONCAT(#{tel}, '%'))
+            )
+        </if>
+    </select>
+
+
+    <select id="selectAllOrdersDetails" parameterType="long"
+            resultType="OrderAdminDto">
+        SELECT o.order_id             AS orderId,
+               o.order_code           AS orderCode,
+               o.total_price          AS totalPrice,
+               o.discount_price       AS discountPrice,
+               o.is_cancelled         AS isCancelled,
+               o.created_at           AS createdAt,
+               o.updated_at           AS updatedAt,
+               o.order_status         AS orderStatus,
+               CASE
+                   WHEN o.user_id IS NOT NULL THEN u.tel
+                   WHEN o.guest_id IS NOT NULL THEN g.tel
+                   ELSE NULL
+                   END                AS tel,
+               oid.orderitemdetail_id AS orderItemDetailId,
+               oid.name               AS name,
+               oid.quantity           AS quantity,
+               oid.price              AS price,
+               pi.image_url           AS imageUrl
+        FROM Orders o
+                 LEFT JOIN UserInfo u ON o.user_id = u.user_id
+                 LEFT JOIN Guest g ON o.guest_id = g.guest_id
+                 JOIN OrderItemDetail oid ON o.order_id = oid.order_id
+                 LEFT JOIN Product_Image pi ON oid.product_id = pi.product_id AND pi.product_main = TRUE
+        WHERE o.order_id = #{orderId}
+        ORDER BY o.created_at DESC
+    </select>
+
+    <select id="selectOrderItemDetailByOrderItemDetailId"
+            parameterType="long"
+            resultType="OrderItemDetailAdminDto">
+
+        SELECT o.order_id                      AS orderId,
+               o.order_code                    AS orderCode,
+               o.is_cancelled                  AS isCancelled,
+               o.order_status                  AS orderStatus,
+               o.payment_method                AS paymentMethod,
+               o.user_id                       AS userId,
+               o.guest_id                      AS guestId,
+
+               oid.orderitemdetail_id          AS orderItemDetailId,
+               oid.name                        AS itemName,
+               oid.quantity                    AS quantity,
+               oid.price                       AS price,
+               oid.discount_price              AS discountPrice,
+               oid.coupon_applied              AS couponApplied,
+               oid.additional_price            AS additionalPrice,
+               oid.additional                  AS additional,
+               oid.item_status                 AS itemStatus,
+
+               p.payment_id                    AS paymentId,
+               p.payment_status                AS paymentStatus,
+               p.total_amount                  AS paymentTotal,
+               p.requested_at                  AS paymentRequestedAt,
+               p.paid_at                       AS paidAt,
+               p.cancelled_at                  AS paymentCancelledAt,
+               p.payment_method                AS paymentMethodDetail,
+
+               COALESCE(u.name, g.name)        AS customerName,
+               COALESCE(u.tel, g.tel)          AS customerTel,
+               COALESCE(u.birth, g.created_at) AS userExtraInfo,
+
+               pi.image_url                    AS imageUrl,
+
+               s.shipment_id                   AS shipmentId,
+               s.tracking_number               AS trackingNumber,
+               s.courier_company               AS courierCompany,
+               s.delivery_status               AS shipmentStatus,
+               s.dispatched_at                 AS dispatchedAt,
+               s.delivered_at                  AS deliveredAt,
+               s.estimated_delivery_date       AS estimatedDeliveryDate,
+
+               s.address                       AS shippingAddress,
+               s.city                          AS shippingCity,
+               s.region                        AS shippingRegion,
+               s.post_num                      AS shippingPostNum,
+               s.road_num                      AS shippingRoadNum,
+               s.delivery_agent_name           AS receiverName,
+               s.delivery_agent_contact        AS receiverTel,
+
+               pd.detail_id                    AS paymentDetailId,
+               pd.product_name                 AS paymentProductName,
+               pd.paid_amount                  AS paidAmount,
+               pd.quantity                     AS paidQuantity,
+               pd.cancelled_quantity           AS cancelledQuantity,
+               pd.cancelled_amount             AS cancelledAmount,
+               pd.fail_reason                  AS failReason,
+               pd.cancelled_at                 AS paymentDetailCancelledAt
+
+        FROM Orders o
+                 JOIN OrderItemDetail oid ON o.order_id = oid.order_id
+                 LEFT JOIN Payment p ON o.order_id = p.order_id
+                 LEFT JOIN PaymentDetail pd
+                           ON p.payment_id = pd.payment_id AND oid.orderitemdetail_id = pd.orderitemdetail_id
+                 LEFT JOIN Product_Image pi ON oid.product_id = pi.product_id AND pi.product_main = TRUE
+                 LEFT JOIN UserInfo u ON o.user_id = u.user_id
+                 LEFT JOIN Guest g ON o.guest_id = g.guest_id
+                 LEFT JOIN Shipment s ON o.order_id = s.order_id
+
+        WHERE oid.orderitemdetail_id = #{orderItemDetailId}
+    </select>
+
+    <select id="selectOrderStatusByOrderId" parameterType="long"
+            resultType="OrderStatusDto">
+        SELECT os.orderstatus_id     AS orderstatusId,
+               os.orderstatus_status AS orderStatusStatus,
+               os.payment_status     AS paymentStatus,
+               os.updated_at         AS updatedAt,
+               o.order_code          AS orderCode
+        FROM OrderStatus os
+                 JOIN Orders o ON o.order_id = os.order_id
+        WHERE os.order_id = #{orderId}
+    </select>
+
+    <select id="selectOrderItemHistoryByOrderItemDetailId" parameterType="long"
+            resultType="OrderItemHistoryDto">
+        SELECT oih.history_id          AS orderItemHistoryId,
+               oih.orderitemdetail_id  AS orderItemDetailId,
+               oih.old_price           AS oldPrice,
+               oih.new_price           AS newPrice,
+               oih.old_quantity        AS oldQuantity,
+               oih.new_quantity        AS newQuantity,
+               oih.change_reason       AS changeReason,
+               oih.changed_at          AS changedAt,
+               u.user_role             AS changeBy,
+               oih.item_history_status AS itemHistoryStatus
+        FROM OrderItemDetail_History oih
+                 LEFT JOIN UserInfo u ON u.user_id = oih.changed_by
+        WHERE oih.orderitemdetail_id = #{orderItemDetailId}
+        ORDER BY oih.changed_at DESC
+    </select>
+
+    <select id="countOrdersByPeriod" parameterType="Map" resultType="int">
+        SELECT COUNT(*)
+        FROM Orders
+        WHERE DATE (created_at) <![CDATA[>=]]> #{startDate}
+          AND DATE (created_at) <![CDATA[ < ]]> #{endDate}
+    </select>
+
+    <select id="selectAllRefund" parameterType="RefundSearchParam"
+            resultType="RefundDto">
+        SELECT
+        r.refund_id AS refundId,
+        r.refund_status AS refundStatus,
+        r.payment_id AS paymentId,
+        r.requested_at AS requestedAt,
+        r.approved_at AS approvedAt,
+        r.refund_total_amount AS refundTotalAmount,
+        r.refund_reason AS refundReason,
+        r.pg_response_code AS pgResponseCode,
+        r.refund_fail_reason AS refundFailReason
+        FROM Refund r
+
+        WHERE 1=1
+
+        <if test="paymentId != null and paymentId != ''">
+            AND payment_id LIKE CONCAT('%', #{paymentId}, '%')
+        </if>
+
+        <if test="refundStatus != null and refundStatus != ''">
+            AND refund_status = #{refundStatus}
+        </if>
+
+        <if test="startDate != null">
+            AND DATE(o.created_at) <![CDATA[ >= ]]> #{startDate}
+        </if>
+        <if test="endDate != null">
+            AND DATE(o.created_at) <![CDATA[ <= ]]> #{endDate}
+        </if>
+
+        ORDER BY r.requested_at
+        <choose>
+            <when test="sortDir != null and sortDir.toLowerCase().equals('asc')">
+                ASC
+            </when>
+            <otherwise>
+                DESC
+            </otherwise>
+        </choose>
+
+    </select>
+
+
+    <resultMap id="RefundWithDetailsMap" type="RefundDto">
+
+        <id property="refundId" column="refundId"/>
+        <result property="refundStatus" column="refundStatus"/>
+        <result property="paymentId" column="paymentId"/>
+        <result property="requestedAt" column="requestedAt"/>
+        <result property="approvedAt" column="approvedAt"/>
+        <result property="refundTotalAmount" column="refundTotalAmount"/>
+        <result property="refundReason" column="refundReason"/>
+        <result property="pgResponseCode" column="pgResponseCode"/>
+        <result property="refundFailReason" column="refundFailReason"/>
+
+        <collection property="details" ofType="RefundDetailDto">
+            <id property="refundTransaction" column="refundTransaction"/>
+            <result property="refundId" column="refundDetailRefundId"/>
+            <result property="issueStatus" column="issueStatus"/>
+            <result property="approvedTime" column="approvedTime"/>
+            <result property="approvedNumber" column="approvedNumber"/>
+            <result property="requestPrice" column="requestPrice"/>
+            <result property="remainingPrice" column="remainingPrice"/>
+            <result property="refundBankName" column="refundBankName"/>
+            <result property="refundBankCode" column="refundBankCode"/>
+        </collection>
+    </resultMap>
+
+
+    <select id="selectRefundByIdWithDetails" resultMap="RefundWithDetailsMap" parameterType="long">
+        SELECT r.refund_id           AS refundId,
+               r.refund_status       AS refundStatus,
+               r.payment_id          AS paymentId,
+               r.requested_at        AS requestedAt,
+               r.approved_at         AS approvedAt,
+               r.refund_total_amount AS refundTotalAmount,
+               r.refund_reason       AS refundReason,
+               r.pg_response_code    AS pgResponseCode,
+               r.refund_fail_reason  AS refundFailReason,
+
+               rd.RefundTransaction  AS refundTransaction,
+               rd.refund_id          AS refundDetailRefundId,
+               rd.issue_status       AS issueStatus,
+               rd.approved_time      AS approvedTime,
+               rd.approved_number    AS approvedNumber,
+               rd.request_price      AS requestPrice,
+               rd.remaining_price    AS remainingPrice,
+               rd.refund_bank_name   AS refundBankName,
+               rd.refund_bank_code   AS refundBankCode
+        FROM Refund r
+                 LEFT JOIN RefundDetail rd ON r.refund_id = rd.refund_id
+        WHERE r.refund_id = #{refundId}
+    </select>
+
+</mapper>

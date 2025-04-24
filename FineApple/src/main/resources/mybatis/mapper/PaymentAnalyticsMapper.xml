@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fineapple.domain.order_payment.repository.PaymentAnalyticsMapper">
+
+    <select id="getDailyPaidAmount" resultType="TimeSeriesDto">
+        SELECT DATE(paid_at) AS date, 'ALL' AS groupKey, SUM(total_amount) AS value
+        FROM Payment
+        WHERE paid_at IS NOT NULL
+        GROUP BY DATE(paid_at)
+    </select>
+
+    <select id="getDailyPaidByMethod" resultType="TimeSeriesDto">
+        SELECT DATE(paid_at) AS date, payment_method AS groupKey, SUM(total_amount) AS value
+        FROM Payment
+        WHERE paid_at IS NOT NULL
+        GROUP BY DATE(paid_at), payment_method
+    </select>
+</mapper>

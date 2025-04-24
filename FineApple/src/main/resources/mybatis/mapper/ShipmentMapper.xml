@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fineapple.domain.shipment.repository.ShipmentMapper">
+
+            <!-- 배송 Id를 기준으로 정보 조회 -->
+             <select id="findShipmentById" resultType="com.fineapple.domain.shipment.dto.ShipmentDetailDto" parameterType="Long">
+                 SELECT s.shipment_id AS shipmentId, s.delivered_at AS deliveredAt,
+                        s.shipping_cost AS shippingCost, s.delivery_agent_name AS deliveryAgentName,
+                        s.delivery_agent_contact AS deliveryAgentContact, s.address AS address,
+                        o.order_id AS orderId, o.payment_method AS paymentMethod,
+                        o.order_status AS orderStatus, o.user_id AS userId,
+                        o.guest_id AS guestId, o.total_price AS totalPrice,
+                        o.discount_price AS discountPrice, st.store_id AS storeId, st.store_number AS storeNumber,
+                        st.name AS storeName, st.location AS location, cc.code AS code, cc.code_name As deliveryStatus,
+                        a.delivery_id AS deliveryId, a.name AS name
+                FROM Shipment s
+                 LEFT JOIN Orders o ON s.order_id = o.order_id
+                 LEFT JOIN Store st ON s.store_id = st.store_id
+                 LEFT JOIN CommonCode cc ON s.delivery_status = cc.code
+                 LEFT JOIN Address a ON s.delivery_id = a.delivery_id
+                WHERE shipment_id = #{shipmentId}
+             </select>
+
+    <!--배송 전체 정보 조회 -->
+    <select id="findAllShipments" resultType="com.fineapple.domain.shipment.dto.ShipmentDto">
+        SELECT
+            s.shipment_id AS shipmentId,
+            s.tracking_number AS trackingNumber,
+            s.tracking_url AS trackingUrl,
+            s.estimated_delivery_date AS estimatedDeliveryDate,
+            s.dispatched_at AS dispatchedAt,
+            cc.code AS delivery_status,
+            s.store_id AS storeId,
+            s.delivery_id AS deliveryId,
+            s.delay_reason AS delayReason,
+            s.delivery_agent_name AS deliveryAgentName,
+            s.delivery_agent_contact AS deliveryAgentContact,
+            a.road_num AS roadNum,
+            a.address,
+            st.name AS store_name,
+            s.order_id AS orderId,
+            st.location,
+            st.store_number AS StoreNumber
+        FROM Shipment s
+                 LEFT JOIN Address a ON s.delivery_id = a.delivery_id
+                 LEFT JOIN CommonCode cc ON s.delivery_status = cc.code
+                 LEFT JOIN Store st ON s.store_id = st.store_id
+    </select>
+
+<!--        <insert id="insertShipment" parameterType = "Shipment">-->
+<!--            INSERT INTO Shipment(-->
+<!--                tracking_number, trackeing_url, estimated_delivery_date, dispatched_at,delivered_at,-->
+<!--                updated_at,delivery_status,store_id,delivery_id, shipping_cost,courier_company,-->
+<!--                delay_reason,delivery_agent_name,delivery_agent_contact,post_num,city,region,road_num,-->
+<!--                address,store_name,order_id-->
+<!--            )-->
+<!--            VALUES(-->
+<!--                #{trackingNumber},#{trackingUrl},#{estimatedDeliveryDate},#{dispatchedAt},#{deliveredAt},-->
+<!--                   #{updatedAt},#{deliveryStatus},#{storeId},#{deliveryId},#{shippingCost},#{courierCompany},-->
+<!--                    #{delayReason},#{deliveryAgentName},#{deliveryAgentContact},#{postNum},#{city},#{region},-->
+<!--                   #{roadNum},#{address},#{storeName},#{orderId}-->
+<!--            )-->
+<!--        </insert>-->
+
+<!--        <update id="updateShipmentStatus" >-->
+<!--            UPDATE Shipment-->
+<!--            SET delivery_status = #{deliveryStatus},-->
+<!--                updated_at = NOW()-->
+<!--            WHERE shipment_id = #{shipmentId}-->
+<!--        </update>-->
+
+
+
+    </mapper>

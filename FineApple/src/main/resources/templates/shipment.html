@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" th:data-logged-in="${#authorization.expression('isAuthenticated()')}">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <title>배송 정보 - FineApple Store</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reset-css@5.0.2/reset.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="/css/main.css">
+  <style>
+    #shipmentTable {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 20px 0;
+    }
+    #shipmentTable th,
+    #shipmentTable td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: left;
+    }
+    #shipmentTable th {
+      background-color: #f2f2f2;
+    }
+  </style>
+</head>
+<body>
+<!-- 내비게이션 -->
+<header class="global-nav">
+  <div class="overlay"></div>
+  <div class="inner">
+    <div class="nav-left">
+      <a th:href="@{/}" class="logo-container">
+        <img src="/images/logo&etc/FineApple-logo.png" style="height : 24px;">
+      </a>
+    </div>
+    <nav class="nav-menu">
+      <ul>
+        <li class="has-submenu" data-menu="store"><a th:href="@{/}">스토어</a></li>
+        <li class="has-submenu"
+            th:each="category : ${mainCategories}"
+            th:data-menu="${category.path}">
+          <a th:href="@{/store/path/{path}(path=${category.path})}"
+             th:text="${category.name}"></a>
+        </li>
+        <li class="has-submenu" data-menu="support"><a th:href="@{/}">고객지원</a></li>
+      </ul>
+    </nav>
+    <div class="search">
+      <input type="text"/>
+      <div class="material-icons" data-menu="search">search</div>
+    </div>
+    <div class="local-mall" data-menu="cart">
+      <div class="material-icons">local_mall</div>
+    </div>
+  </div>
+
+  <div id="global-dropdown" class="dropdown">
+    <div class="dropdown-inner" id="dropdown-content"></div>
+  </div>
+</header>
+<div class="top-banner">
+  <p>🎁 지금 FineApple에서만! 프리미엄 쇼핑의 시작, 할인된 가격으로 만나보세요. <a href="#">자세히 보기</a></p>
+</div>
+
+<main>
+  <h2 style="text-align:center; margin-top:20px;">배송 정보</h2>
+  <table id="shipmentTable">
+    <thead>
+    <tr>
+      <th>배송 ID</th>
+      <th>운송장 번호</th>
+      <th>운송장 URL</th>
+      <th>예상 배송일</th>
+      <th>출고일시</th>
+      <th>배송 완료일시</th>
+      <th>배송 대행자</th>
+      <th>주소</th>
+      <th>상점명</th>
+      <th>이동</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="s : ${list}">
+      <td th:text="${s.shipmentId}">1</td>
+      <td th:text="${s.trackingNumber}">TRK123</td>
+      <td>
+        <a th:href="${s.trackingUrl}"
+           th:text="${s.trackingUrl != null ? s.trackingUrl : '-'}"
+           target="_blank">링크</a>
+      </td>
+      <td th:text="${s.estimatedDeliveryDate != null ? #temporals.format(s.estimatedDeliveryDate, 'yyyy-MM-dd HH:mm') : '-'}">날짜</td>
+      <td th:text="${s.dispatchedAt != null ? #temporals.format(s.dispatchedAt, 'yyyy-MM-dd HH:mm') : '-'}">출고</td>
+      <td>-</td> <!-- deliveredAt 없으므로 일단 placeholder 처리 -->
+      <td th:text="${s.deliveryAgentName != null ? s.deliveryAgentName : '-'}">홍길동</td>
+      <td th:text="|${s.roadNum} ${s.address}|">주소</td>
+      <td th:text="${s.storeName != null ? s.storeName : '-'}">Fine Store</td>
+      <td>
+        <a style="padding : 5px; display:inline-block; background:#eee; border:1px solid #ccc;"
+           th:href="@{/shipment/{shipmentId}(shipmentId=${s.shipmentId})}">
+          상세 페이지로 이동
+        </a>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</main>
+</body>
+</html>

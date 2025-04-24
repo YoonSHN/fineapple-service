@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fineapple.domain.logistics_inventory.repository.ShipmentAnalyticsMapper">
+
+    <select id="getDailyDispatchCount" resultType="TimeSeriesDto">
+        SELECT DATE(dispatched_at) AS date, 'ALL' AS groupKey, COUNT(*) AS value
+        FROM Shipment
+        GROUP BY DATE(dispatched_at)
+
+    </select>
+    <select id="getDailyDelayCount" resultType="TimeSeriesDto">
+        SELECT DATE(dispatched_at) AS date, 'ALL' AS groupKey, COUNT(*) AS value
+        FROM Shipment
+        WHERE delay_reason IS NOT NULL
+        GROUP BY DATE(dispatched_at)
+    </select>
+
+   
+</mapper>

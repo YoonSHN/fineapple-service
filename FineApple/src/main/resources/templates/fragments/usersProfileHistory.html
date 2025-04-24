@@ -1,0 +1,86 @@
+<div th:fragment="usersProfileHistory" data-page="userprofilehistory">
+    <main class="main-content">
+        <header class="main-header">
+            <h1>고객 프로필 변경 이력</h1>
+            <div class="header-actions">
+                <!-- 알림 -->
+                <details class="notif-menu">
+                    <summary class="notif-btn">
+                        <span class="material-symbols-outlined">notifications</span>
+                        <span class="notif-dot"></span>
+                    </summary>
+                    <div class="notif-dropdown">
+                        <div class="notif-item">새 주문이 들어왔습니다.</div>
+                        <div class="notif-item">상품 재고가 부족합니다.</div>
+                        <div class="notif-item">결제가 완료되었습니다.</div>
+                    </div>
+                </details>
+                <!-- 사용자 메뉴 -->
+                <div class="user-menu">
+                    <details class="user-menu__details">
+                        <summary class="user-menu__summary">
+                            <div class="user-menu__avatar"
+                                 th:if="${#authorization.expression('isAuthenticated()')}"
+                                 th:text="${#strings.substring(#authentication.name, 0, 1)}">
+                                JD
+                            </div>
+                            <span class="user-menu__name" th:if="${#authorization.expression('isAuthenticated()')}"
+                                  th:text="${#strings.substringBefore(#authentication.name, '@')}">John Doe</span>
+                        </summary>
+                        <div class="user-menu__dropdown">
+                            <a href="#" class="user-menu__item">My Profile</a>
+                            <a href="#" class="user-menu__item">Settings</a>
+                            <div class="user-menu__divider"></div>
+                            <form id="logout-form" th:action="@{/logout}" method="post">
+                                <button type="submit" class="user-menu__item">Logout</button>
+                            </form>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </header>
+
+        <header class="search-header">
+            <div class="header-actions">
+                <div class="search-box profile-history-search-box"
+                     style="display: flex; align-items: center; gap: 0.5rem;">
+                    <select id="search-key" style="width: 120px;">
+                        <option value="userId">회원 ID</option>
+                        <option value="fieldChanged">변경 필드</option>
+                    </select>
+                    <input type="text" id="search-value" placeholder="검색어를 입력" style="width: 200px;"/>
+                    <button id="profile-history-search-btn" class="btn-add">
+                        <span class="btn-icon material-icons">search</span>검색
+                    </button>
+                </div>
+
+            </div>
+        </header>
+
+        <section class="profile-history-panel">
+            <div class="profile-history-table-wrap">
+                <table class="profile-history-table">
+                    <thead>
+                    <tr>
+                        <th>히스토리 ID</th>
+                        <th>회원 ID</th>
+                        <th>변경 필드</th>
+                        <th>이전 값</th>
+                        <th>새 값</th>
+                        <th>변경자</th>
+                        <th>변경일</th>
+                    </tr>
+                    </thead>
+                    <tbody id="profile-history-body">
+
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <button id="profile-history-prevPage">이전</button>
+                <span id="profile-history-pageNumbers"></span>
+                <button id="profile-history-nextPage">다음</button>
+            </div>
+        </section>
+    </main>
+</div>

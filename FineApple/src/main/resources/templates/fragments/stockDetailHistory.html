@@ -1,0 +1,58 @@
+<div th:fragment="stockDetailHistory" data-page="stockhistory">
+  <main class="main-content">
+    <header class="main-header">
+      <h1>스토어 재고 변경 내역</h1>
+      <div class="header-actions">
+        <!-- 사용자 메뉴 -->
+        <div class="user-menu">
+          <details class="user-menu__details">
+            <summary class="user-menu__summary">
+              <div class="user-menu__avatar"
+                   th:if="${#authorization.expression('isAuthenticated()')}"
+                   th:text="${#strings.substring(#authentication.name, 0, 1)}">
+                JD
+              </div>
+              <span class="user-menu__name" th:if="${#authorization.expression('isAuthenticated()')}"
+                    th:text="${#strings.substringBefore(#authentication.name, '@')}">John Doe</span>
+            </summary>
+            <div class="user-menu__dropdown">
+              <a href="#" class="user-menu__item">My Profile</a>
+              <a href="#" class="user-menu__item">Settings</a>
+              <div class="user-menu__divider"></div>
+              <a href="#" class="user-menu__item" id="logout-link">Logout</a>
+              <form id="logout-form" th:action="@{/logout}" method="post">
+                <button type="submit" class="user-menu__item">Logout</button>
+              </form>
+            </div>
+          </details>
+        </div>
+      </div>
+    </header>
+
+    <section class="stores-panel">
+      <div class="stores-table-wrap">
+        <table class="stores-table">
+          <thead>
+          <tr>
+            <th>내역 ID</th>
+            <th>스토어명</th>
+            <th>상품명</th>
+            <th>변경 유형</th>
+            <th>변경 전 수량</th>
+            <th>변경 후 수량</th>
+            <th>메모</th>
+          </tr>
+          </thead>
+          <tbody id="stock-history-body">
+          <!-- JS로 채워질 영역 -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ✅ 페이징 컨테이너 추가 -->
+      <div class="pagination-fixed-wrapper">
+        <div id="pagination-container" class="pagination-wrap"></div>
+      </div>
+    </section>
+  </main>
+</div>

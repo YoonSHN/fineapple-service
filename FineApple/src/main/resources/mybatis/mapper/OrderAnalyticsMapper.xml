@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fineapple.domain.order_payment.repository.OrderAnalyticsMapper">
+
+    <select id="getDailyOrderCount" resultType="TimeSeriesDto">
+        SELECT DATE(created_at) AS date, 'ALL' AS groupKey, COUNT(*) AS value
+        FROM Orders
+        WHERE is_cancelled = FALSE
+        GROUP BY DATE(created_at)
+    </select>
+
+    <select id="getProductSalesCount" resultType="TimeSeriesDto">
+        SELECT DATE(created_at) AS date, product_id AS groupKey, SUM(quantity) AS value
+        FROM OrderItemDetail
+        GROUP BY DATE(created_at), product_id
+    </select>
+
+    <select id="getDailyRevenue" resultType="TimeSeriesDto">
+        SELECT DATE(o.created_at) AS date, 'ALL' AS groupKey, SUM(oid.quantity * oid.price) AS value
+        FROM Orders o JOIN OrderItemDetail oid ON o.order_id = oid.order_id
+        WHERE o.is_cancelled = FALSE
+        GROUP BY DATE(o.created_at)
+    </select>
+
+    <select id="getMonthlyRevenue" resultType="TimeSeriesDto">
+        SELECT DATE_FORMAT(o.created_at, '%Y-%m-01') AS date, 'ALL' AS groupKey, SUM(oid.quantity * oid.price) AS value
+        FROM Orders o JOIN OrderItemDetail oid ON o.order_id = oid.order_id
+        WHERE o.is_cancelled = FALSE
+        GROUP BY DATE_FORMAT(o.created_at, '%Y-%m-01')
+    </select>
+
+    <select id="getPredictedDailyRevenue" resultType="TimeSeriesDto">
+        SELECT date,
+               group_key AS groupKey,
+               value
+        FROM predicted_values
+        WHERE group_key = 'daily'
+        ORDER BY date;
+
+    </select>
+
+    <select id="getMonthlyPredictedValues" resultType="TimeSeriesDto">
+        SELECT
+            date,
+            group_key AS groupKey,
+            value
+        FROM predicted_values
+        WHERE group_key = 'monthly'
+        ORDER BY date
+    </select>
+</mapper>

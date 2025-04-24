@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fineapple.domain.order_payment.repository.PaymentMapper">
+    
+    <select id="selectPaymentAmountCountToday" parameterType="Map" resultType="Long">
+        SELECT SUM(total_amount)
+        FROM Payment
+        WHERE DATE(paid_at) <![CDATA[ >= ]]> #{startDate}
+        AND DATE(paid_at) <![CDATA[ < ]]> #{endDate}
+        AND payment_status = 'OR0202'
+    </select>
+
+    <select id="selectPaymentAmountByWeekday" resultType="com.fineapple.domain.order_payment.dto.PaymentAmountByWeekdayDto">
+        SELECT DAYNAME(paid_at) AS weekday,
+               SUM(total_amount) AS totalAmount
+        FROM Payment
+        WHERE payment_status = 'OR0202'
+        GROUP BY DAYNAME(paid_at)
+        ORDER BY FIELD(weekday, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')
+    </select>
+
+</mapper>

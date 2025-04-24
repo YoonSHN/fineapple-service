@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fineapple.domain.order_payment.repository.OrderStockMapper">
+
+    <update id="decreaseStock" parameterType="map">
+        UPDATE Stock
+        SET quantity = quantity - #{quantity}
+        WHERE product_id = #{productId} AND quantity >= #{quantity}
+    </update>
+
+    <select id="selectStockByProductId" resultType="Integer">
+        SELECT COALESCE(SUM(quantity), 0)
+        FROM Stock
+        WHERE product_id =#{productId}
+    </select>
+</mapper>

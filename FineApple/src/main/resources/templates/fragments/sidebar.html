@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<body>
+<div th:fragment="sidebar">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h1>관리자 패널</h1>
+        </div>
+        <nav class="sidebar-nav">
+            <ul>
+                <li>
+                    <a href="/dashboard" class="nav-link">
+                        <span class="nav-icon material-icons">dashboard</span>
+                        <span class="nav-text">대시보드</span>
+                    </a>
+                </li>
+                <li>
+                    <details class="nav-group">
+                        <summary class="nav-link details-summary">
+                            <span class="nav-icon material-icons">people</span>
+                            <span class="nav-text">고객</span>
+                            <span class="nav-arrow material-icons">expand_more</span>
+                        </summary>
+                        <ul class="submenu">
+                            <li><a href="/users/list" class="submenu-link">고객 리스트</a></li>
+                            <li><a href="/users/profile-history" class="submenu-link">고객 프로필 변경 이력</a></li>
+                            <li><a href="/users/login-history" class="submenu-link">고객 로그인 이력</a></li>
+                        </ul>
+                    </details>
+                </li>
+                <li>
+                    <details class="nav-group">
+                        <summary class="nav-link details-summary">
+                            <span class="nav-icon material-icons">shopping_bag</span>
+                            <span class="nav-text">주문</span>
+                            <span class="nav-arrow material-icons">expand_more</span>
+                        </summary>
+                        <ul class="submenu">
+                            <li><a href="/orders/list" class="submenu-link">주문 내역</a></li>
+                            <li><a href="/orders/refund" class="submenu-link">환불 요청</a></li>
+                        </ul>
+                    </details>
+                </li>
+                <li>
+                    <details class="nav-group">
+                        <summary class="nav-link details-summary">
+                            <span class="nav-icon material-icons">production_quantity_limits</span>
+                            <span class="nav-text">상품</span>
+                            <span class="nav-arrow material-icons">expand_more</span>
+                        </summary>
+                        <ul class="submenu">
+                            <li><a href="/products/list" class="submenu-link">상품 리스트</a></li>
+                            <li><a href="/products/history" class="submenu-link">상품 이력</a></li>
+                        </ul>
+                    </details>
+                </li>
+                <li>
+                    <details class="nav-group">
+                        <summary class="nav-link details-summary">
+                            <span class="nav-icon material-icons">inventory</span>
+                            <span class="nav-text">스토어 재고</span>
+                            <span class="nav-arrow material-icons">expand_more</span>
+                        </summary>
+                        <ul class="submenu">
+                            <li><a href="/inventory/store" class="submenu-link">스토어</a></li>
+                            <li><a href="/inventory/status" class="submenu-link">재고 현황</a></li>
+                            <li><a href="/inventory/history" class="submenu-link"> 재고 입출고 내역</a></li>
+                            <li><a href="/inventory/register" class="submenu-link">재고 등록</a></li>
+                        </ul>
+                    </details>
+                </li>
+                <li>
+                    <details class="nav-group">
+                        <summary class="nav-link details-summary">
+                            <span class="nav-icon material-icons">analytics</span>
+                            <span class="nav-text">분석</span>
+                            <span class="nav-arrow material-icons">expand_more</span>
+                        </summary>
+                        <ul class="submenu">
+                            <li><a href="/analytics/report" class="submenu-link">판매 보고서</a></li>
+                            <li><a href="/analytics/traffic-report" class="submenu-link">트래픽 보고서</a></li>
+                        </ul>
+                    </details>
+                </li>
+                <li>
+                    <a href="/settings" class="nav-link">
+                        <span class="nav-icon material-icons">settings</span>
+                        <span class="nav-text">설정</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+</div>
+</body>
+</html>

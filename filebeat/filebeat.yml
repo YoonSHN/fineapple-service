@@ -1,0 +1,16 @@
+filebeat.inputs:
+  - type: log
+    paths:
+      - /app/logs/*.json
+    json.keys_under_root: true
+    json.add_error_key: true
+#    json.message_key: message
+#    multiline.pattern: '^\d{4}-\d{2}-\d{2}'
+#    multiline.negate: true
+#    multiline.match: after
+
+processors:
+  - add_docker_metadata: ~
+
+output.logstash:
+  hosts: ["logstash:5000"]
