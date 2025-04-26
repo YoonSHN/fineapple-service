@@ -8,6 +8,7 @@ async def personal_recommend(user_id):
     if df.empty:
         return {"message": "최근 본 상품 정보가 없습니다."}
 
+    print(df.head())  # 데이터 확인용 로그 추가
     product_id = int(df.iloc[0]['product_id'])
 
     recommendation = recommend_similar_items(product_id)

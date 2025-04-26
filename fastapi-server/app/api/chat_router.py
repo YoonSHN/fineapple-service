@@ -31,4 +31,4 @@ async def recommend_chat_intro(request: Request):
     service = IntroRecommendationService()
     message = await service.generate_intro_message(user_id)
 
-    return {"message": message}
+    return {"content": message}
