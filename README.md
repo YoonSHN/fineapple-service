@@ -13,7 +13,7 @@
 |--|--|--|
 |✅|ERD툴을 이용한 논리 모델링 작성|![ERD](images/ERD전체모델링.png)
 |✅|물리모델링 & 테이블 생성 및 데이터 입력 스크립트 작성|[스크립트 디렉토리](/src/main/resources/db/migration)
-|✅|mysql도커|[MYSQL 8.4.3을 사용하는 도커](/docker-compose.yml)
+|✅|mysql도커|[MYSQL 8.4.3을 사용하는 도커](/docker-compose.prod.yml)
 
 ### 프로젝트 요구 사항(필수)
 기본 정보 테이블 & 행위 테이블 설계
