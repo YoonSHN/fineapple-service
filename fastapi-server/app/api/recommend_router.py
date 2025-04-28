@@ -11,7 +11,7 @@ router = APIRouter(
 
 @router.get("/{product_id}")
 async def get_recommendations(product_id: int):
-    return await recommend_similar_items(product_id)
+    return recommend_similar_items(product_id)
 
 @router.get("/user/{user_id}")
 async def personal_recommendations(user_id: int):

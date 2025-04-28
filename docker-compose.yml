@@ -40,6 +40,7 @@ services:
       - "8000:8000"
     networks:
       - backend-net
+      - elk-net
     depends_on:
       - mysql-main
     environment:
@@ -97,11 +98,11 @@ services:
     container_name: filebeat
     user: root
     volumes:
-      - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /var/log:/var/log:ro
-      - spring-logs:/app/logs:ro
+      - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - /var/lib/docker/containers:/var/lib/docker/containers
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/log:/var/log
+      - spring-logs:/app/logs
     depends_on:
       - logstash
     networks:

@@ -23,15 +23,15 @@ connection_pool = pooling.MySQLConnectionPool(
 )
 
 # 클릭로그 커넥션 풀에서 받아오기
-def get_click_log():
-    conn = connection_pool.get_connection()
-
-    try:
-        query = "SELECT user_id, session_id, product_id FROM ClickLog"
-        click_log_df = pd.read_sql(query, conn)
-    finally:
-        conn.close()
-    return click_log_df
+# def get_click_log():
+#     conn = connection_pool.get_connection()
+#
+#     try:
+#         query = "SELECT user_id, session_id, product_id FROM ClickLog"
+#         click_log_df = pd.read_sql(query, conn)
+#     finally:
+#         conn.close()
+#     return click_log_df
 
 # 카테고리 데이터 받아오기
 def get_category_data():
