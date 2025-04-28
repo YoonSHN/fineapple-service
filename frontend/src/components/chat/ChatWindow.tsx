@@ -10,11 +10,10 @@ import { Product } from '@/types/product';
 interface ChatWindowProps {
     isOpen: boolean;
     onClose: () => void;
-    isLoggedIn: boolean;
     onLogout: () => void;
 }
 
-const ChatWindow: React.FC<ChatWindowProps> = ({ isOpen, onClose, isLoggedIn, onLogout }) => {
+const ChatWindow: React.FC<ChatWindowProps> = ({ isOpen, onClose, onLogout }) => {
     const [messages, setMessages] = useState<MessageType[]>([
         {
             id: '1',
@@ -48,21 +47,33 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ isOpen, onClose, isLoggedIn, on
                     }
 
                     const data = await res.json();
-                    const introMessage: MessageType = {
-                        id: (Date.now() + 1).toString(),
-                        content: data.content,
-                        sender: 'bot',
-                        timestamp: new Date(),
-                    };
-                    setMessages((prev) => [...prev, introMessage]);
+                    console.log('Intro message data:', data);
 
-                    if (data.type === 'recommendation' && Array.isArray(data.products)) {
-                        setRecommendationProducts(data.products);
-                        setShowRecommendation(true);
+                    if (data.content && typeof data.content === 'string') {
+                        const introMessage: MessageType = {
+                            id: (Date.now() + 1).toString(),
+                            content: data.content,
+                            sender: 'bot',
+                            timestamp: new Date(),
+                        };
+                        setMessages((prev) => [...prev, introMessage]);
+
+                        if (data.type === 'recommendation' && Array.isArray(data.products)) {
+                            setRecommendationProducts(data.products);
+                            setShowRecommendation(true);
+                        }
+                    } else {
+                        const errorMessage: MessageType = {
+                            id: (Date.now() + 2).toString(),
+                            content: '응답 데이터가 유효하지 않습니다.',
+                            sender: 'bot',
+                            timestamp: new Date(),
+                        };
+                        setMessages((prev) => [...prev, errorMessage]);
                     }
                 } catch (err: any) {
                     const errorMessage: MessageType = {
-                        id: (Date.now() + 2).toString(),
+                        id: (Date.now() + 3).toString(),
                         content: err.message,
                         sender: 'bot',
                         timestamp: new Date(),
@@ -103,14 +114,25 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ isOpen, onClose, isLoggedIn, on
 
             const data = await res.json();
 
-            setMessages((prev) =>
-                prev.filter((msg) => msg.id !== 'loading').concat({
-                    id: (Date.now() + 1).toString(),
-                    content: data.content,
-                    sender: 'bot',
-                    timestamp: new Date(),
-                })
-            );
+            if (data.content && typeof data.content === 'string') {
+                setMessages((prev) =>
+                    prev.filter((msg) => msg.id !== 'loading').concat({
+                        id: (Date.now() + 1).toString(),
+                        content: data.content,
+                        sender: 'bot',
+                        timestamp: new Date(),
+                    })
+                );
+            } else {
+                setMessages((prev) =>
+                    prev.filter((msg) => msg.id !== 'loading').concat({
+                        id: (Date.now() + 2).toString(),
+                        content: '응답 데이터가 유효하지 않습니다.',
+                        sender: 'bot',
+                        timestamp: new Date(),
+                    })
+                );
+            }
 
             if (data.type === 'comparison' && Array.isArray(data.products)) {
                 setComparisonProducts(data.products);
@@ -122,7 +144,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ isOpen, onClose, isLoggedIn, on
         } catch (err: any) {
             setMessages((prev) =>
                 prev.filter((msg) => msg.id !== 'loading').concat({
-                    id: (Date.now() + 2).toString(),
+                    id: (Date.now() + 3).toString(),
                     content: err.message,
                     sender: 'bot',
                     timestamp: new Date(),
@@ -147,11 +169,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ isOpen, onClose, isLoggedIn, on
             >
                 <ChatHeader onClose={onClose} onLogout={onLogout} />
                 <ChatMessages messages={messages} isBotTyping={isBotTyping} />
-                <MessageInput
-                    onSendMessage={handleSendMessage}
-                    isOpen={isOpen}
-                    isLoggedIn={isLoggedIn}
-                />
+                <MessageInput onSendMessage={handleSendMessage} isOpen={isOpen} />
             </div>
 
             <ChatModals
