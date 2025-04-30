@@ -1,7 +1,7 @@
 package com.fineapple.domain.product.service;
 
-import com.fineapple.Infrastructure.exception.ProductNotFoundException;
-import com.fineapple.Infrastructure.exception.ProductUploadException;
+import com.fineapple.application.exception.ProductNotFoundException;
+import com.fineapple.application.exception.ProductUploadException;
 import com.fineapple.domain.product.dto.*;
 import com.fineapple.domain.product.repository.ProductMapper;
 import com.github.pagehelper.PageHelper;

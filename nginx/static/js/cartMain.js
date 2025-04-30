@@ -1,5 +1,5 @@
 import { fetchCartItems, addCartItem, removeCartItem } from './cartApi.js';
-import { renderCartItems, setupRemoveButtons } from './cartUI.js';
+import { renderCartItems, setupRemoveButtons } from './cartUi.js';
 
 let userId;
 

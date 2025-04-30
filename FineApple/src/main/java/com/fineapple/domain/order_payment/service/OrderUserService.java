@@ -1,6 +1,6 @@
 package com.fineapple.domain.order_payment.service;
 
-import com.fineapple.Infrastructure.exception.OrderNotFoundException;
+import com.fineapple.application.exception.OrderNotFoundException;
 import com.fineapple.domain.order_payment.dto.OrderResponseDto;
 import com.fineapple.domain.order_payment.dto.OrderUserDto;
 import com.fineapple.domain.order_payment.dto.OrderUserInfoDto;

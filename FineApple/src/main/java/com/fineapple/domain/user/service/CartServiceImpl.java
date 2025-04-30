@@ -1,7 +1,7 @@
 package com.fineapple.domain.user.service;
 
-import com.fineapple.Infrastructure.exception.CartNotFoundException;
-import com.fineapple.Infrastructure.exception.ProductNotFoundException;
+import com.fineapple.application.exception.CartNotFoundException;
+import com.fineapple.application.exception.ProductNotFoundException;
 import com.fineapple.domain.product.dto.ProductDetailDto;
 import com.fineapple.domain.product.repository.ProductMapper;
 import com.fineapple.domain.user.dto.CartDto;

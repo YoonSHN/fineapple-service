@@ -1,0 +1,64 @@
+<div th:fragment="storeList" data-page="storelist">
+    <main class="main-content">
+        <header class="main-header">
+            <h1>스토어 목록</h1>
+            <div class="header-actions">
+                <!-- 사용자 메뉴 -->
+                <div class="user-menu">
+                    <details class="user-menu__details">
+                        <summary class="user-menu__summary">
+                            <div class="user-menu__avatar"
+                                 th:if="${#authorization.expression('isAuthenticated()')}"
+                                 th:text="${#strings.substring(#authentication.name, 0, 1)}">
+                                JD
+                            </div>
+                            <span class="user-menu__name" th:if="${#authorization.expression('isAuthenticated()')}"
+                                  th:text="${#strings.substringBefore(#authentication.name, '@')}">John Doe</span>
+                        </summary>
+                        <div class="user-menu__dropdown">
+                            <a href="#" class="user-menu__item">My Profile</a>
+                            <a href="#" class="user-menu__item">Settings</a>
+                            <div class="user-menu__divider"></div>
+                            <a href="#" class="user-menu__item" id="logout-link">Logout</a>
+                            <form id="logout-form" th:action="@{/logout}" method="post">
+                                <button type="submit" class="user-menu__item">Logout</button>
+                            </form>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </header>
+
+<!--        <header class="search-header">-->
+<!--            <div class="header-actions">-->
+<!--                <div class="search-box" style="display: flex; align-items: center; gap: 0.5rem;">-->
+<!--                    <input type="text" name="name" placeholder="스토어 이름" style="width: 150px;">-->
+<!--                    <input type="text" name="location" placeholder="위치" style="width: 150px;">-->
+<!--                    <input type="text" name="storeNumber" placeholder="스토어 번호" style="width: 150px;">-->
+<!--                    <button id="store-search-btn" class="btn-add">-->
+<!--                        <span class="btn-icon material-icons">search</span>검색-->
+<!--                    </button>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </header>-->
+
+        <section class="stores-panel">
+            <div class="stores-table-wrap">
+                <table class="stores-table">
+                    <thead>
+                    <tr>
+                        <th>스토어 ID</th>
+                        <th>스토어 이름</th>
+                        <th>위치</th>
+                        <th>스토어 번호</th>
+                        <th>상세 재고 보기</th>
+                    </tr>
+                    </thead>
+                    <tbody id="stores-body">
+
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</div>

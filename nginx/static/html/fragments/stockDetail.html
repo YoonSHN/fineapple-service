@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>상세 재고 정보</title>
+</head>
+<body>
+<h1>재고 상세 정보</h1>
+
+<table border="1">
+    <tr>
+        <th>스토어 ID</th>
+        <td th:text="${stockDetail.storeId}">Store ID</td>
+    </tr>
+    <tr>
+        <th>상품 ID</th>
+        <td th:text="${stockDetail.productId}">Product ID</td>
+    </tr>
+    <tr>
+        <th>수량</th>
+        <td th:text="${stockDetail.quantity}">Quantity</td>
+    </tr>
+    <tr>
+        <th>재고 상태</th>
+        <td th:text="${stockDetail.stockStatus}">Stock Status</td>
+    </tr>
+    <tr>
+        <th>최소 재고량</th>
+        <td th:text="${stockDetail.minStockLevel}">Min</td>
+    </tr>
+    <tr>
+        <th>최대 재고량</th>
+        <td th:text="${stockDetail.maxStockLevel}">Max</td>
+    </tr>
+    <tr>
+        <th>입고 수량</th>
+        <td th:text="${stockDetail.stockInQuantity}">In</td>
+    </tr>
+    <tr>
+        <th>출고 수량</th>
+        <td th:text="${stockDetail.stockOutQuantity}">Out</td>
+    </tr>
+    <tr>
+        <th>최근 입고일</th>
+        <td th:text="${stockDetail.lastRestockDate}">Last Restock</td>
+    </tr>
+    <tr>
+        <th>최초 입고일</th>
+        <td th:text="${stockDetail.firstStockInDate}">First</td>
+    </tr>
+    <tr>
+        <th>최근 출고일</th>
+        <td th:text="${stockDetail.lastStockOutDate}">Last Out</td>
+    </tr>
+    <tr>
+        <th>재입고 필요 여부</th>
+        <td th:text="${stockDetail.isRestockRequired ? '예' : '아니오'}">Restock?</td>
+    </tr>
+</table>
+
+<br>
+<!--<a th:href="@{'/adm/inventory/' + ${stockDetail.storeId} + '/stock'}">← 재고 목록으로 돌아가기</a>-->
+
+</body>
+</html>

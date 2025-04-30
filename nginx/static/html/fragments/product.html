@@ -1,0 +1,289 @@
+<div th:fragment="product" data-page="product">
+  <main class="main-content">
+    <header class="main-header">
+      <h1>상품 목록</h1>
+      <div class="header-actions">
+        <div class="product-add-panel">
+          <button id="product-add-btn" class="btn-add">
+            <span class="btn-icon material-icons">add</span>상품 추가
+          </button>
+        </div>
+        <details class="notif-menu">
+          <summary class="notif-btn">
+            <span class="material-symbols-outlined">notifications</span>
+            <span class="notif-dot"></span>
+          </summary>
+          <div class="notif-dropdown">
+            <div class="notif-item">새 주문이 들어왔습니다.</div>
+            <div class="notif-item">상품 재고가 부족합니다.</div>
+            <div class="notif-item">결제가 완료되었습니다.</div>
+          </div>
+        </details>
+
+        <div class="user-menu">
+          <details class="user-menu__details">
+            <summary class="user-menu__summary">
+              <div class="user-menu__avatar"
+                   th:if="${#authorization.expression('isAuthenticated()')}"
+                   th:text="${#strings.substring(#authentication.name, 0, 1)}">
+                JD
+              </div>
+              <span class="user-menu__name" th:if="${#authorization.expression('isAuthenticated()')}"
+                    th:text="${#strings.substringBefore(#authentication.name, '@')}">John Doe</span>
+            </summary>
+            <div class="user-menu__dropdown">
+              <a href="#" class="user-menu__item">My Profile</a>
+              <a href="#" class="user-menu__item">Settings</a>
+              <div class="user-menu__divider"></div>
+              <form id="logout-form" th:action="@{/logout}" method="post">
+                <button type="submit" class="user-menu__item">Logout</button>
+              </form>
+            </div>
+          </details>
+        </div>
+      </div>
+
+    </header>
+
+    <header class="search-header">
+      <div class="header-actions">
+        <div class="search-box" style="display: flex; align-items: center; gap: 0.5rem;">
+          <select name="isActive" style="width: 80px;">
+            <option value="">전체</option>
+            <option value="true">활성</option>
+            <option value="false">비활성</option>
+          </select>
+          <select name="saleStatus" style="width: 100px;">
+            <option value="">전체</option>
+            <option value="PR0101">판매 중</option>
+            <option value="PR0104">판매 중지</option>
+            <option value="PR0106">판매 예정</option>
+          </select>
+          <select name="sortDir" style="width: 100px;">
+            <option value="desc">내림차순</option>
+            <option value="asc">오름차순</option>
+          </select>
+          <input type="date" name="startDate" style="width: 130px;"/>
+          <input type="date" name="endDate" style="width: 130px;"/>
+          <input type="text" name="productName" placeholder="상품명 검색" style="width: 150px;"/>
+          <button id="product-search-btn" class="btn-add">
+            <span class="btn-icon material-icons">search</span>검색
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <section class="product-panel">
+      <div class="product-table-wrap">
+        <table class="product-table">
+          <thead>
+          <tr>
+            <th>상품 ID</th>
+            <th>상품 이미지</th>
+            <th>상품명</th>
+            <th>카테고리</th>
+            <th>가격</th>
+            <th>등록일</th>
+            <th>수정일</th>
+            <th>상세 보기</th>
+            <th>옵션 추가</th>
+          </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <button id="product-prevPage">이전</button>
+        <span id="product-pageNumbers"></span>
+        <button id="product-nextPage">다음</button>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- 상품 상세 모달 -->
+<div id="productDetailModal" class="modal" style="display: none;">
+  <div class="modal-content">
+    <button id="closeProductDetailModalBtn" class="close-button">X</button>
+    <h2>상품 정보</h2>
+    <table class="modal-detail-table">
+      <tbody>
+      <tr>
+        <th>상품 ID</th>
+        <td id="modalProductId"></td>
+        <th>상품명</th>
+        <td id="modalProductName"></td>
+      </tr>
+      <tr>
+        <th>가격</th>
+        <td id="modalPrice"></td>
+        <th>판매 상태</th>
+        <td id="modalSaleStatus"></td>
+      </tr>
+      <tr>
+        <th>카테고리</th>
+        <td id="modalCategoryName"></td>
+      </tr>
+      <tr>
+        <th>등록 일시</th>
+        <td id="modalCreatedAt"></td>
+        <th>수정 일시</th>
+        <td id="modalUpdatedAt"></td>
+      </tr>
+      <tr>
+        <th>사용 여부</th>
+        <td id="modalIsActive"></td>
+        <th>상품 설명</th>
+        <td id="modalDescription"></td>
+        <tr>
+        <th>이미지 수정</th>
+        <td id="modalProductImageUpload" colspan="3">-</td>
+        </tr>
+      </tr>
+      </tbody>
+    </table>
+
+    <h2 style="margin-top: 30px;">옵션 정보</h2>
+
+    <table class="modal-detail-table">
+      <thead>
+      <tr>
+        <th>옵션 ID</th>
+        <th>옵션명</th>
+        <th>옵션값</th>
+        <th>추가 가격</th>
+      </tr>
+      </thead>
+      <tbody id="productOptionTableBody"></tbody>
+    </table>
+    <div style="margin-top: 20px; display: flex; gap: 10px;">
+      <button id="toggleProductActiveBtn" class="modal-delete-btn">
+        상품 상태 변경
+      </button>
+      <button id="deleteProductOptionBtn" class="modal-delete-btn">
+        선택 옵션 삭제
+      </button>
+      <button id="editModeBtn" onclick="enterEditMode(document.getElementById('modalProductId').textContent)">
+        수정
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- 상품 추가 모달 -->
+<div id="productAddModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <button id="closeProductAddModalBtn" class="close-button">X</button>
+        <h2>상품 추가</h2>
+
+        <form id="productAddForm">
+            <label>상품명 <input type="text" name="name" required></label><br>
+            <label>상품 설명 <input type="text" name="description"></label><br>
+            <label>가격 <input type="number" name="price" required></label><br>
+            <label>카테고리
+              <select name="categoryId" id="categorySelect" required>
+                <option value="">카테고리를 선택하세요</option>
+              </select>
+            </label><br>
+            <label>판매 상태
+                <select name="saleStatus">
+                    <option value="PR0101">판매 중</option>
+                    <option value="PR0102">판매 중지</option>
+                    <option value="PR0103">판매 예정</option>
+                </select>
+            </label><br>
+            <label>대표 이미지 설명 <input type="text" name="altText"></label><br>
+            <label>대표 이미지 여부
+                <select name="productMain">
+                    <option value="true">대표</option>
+                    <option value="false">아님</option>
+                </select>
+            </label><br>
+            <label>이미지 업로드 <input type="file" name="file" required></label><br><br>
+            <button type="submit">등록</button>
+        </form>
+    </div>
+</div>
+
+<!-- 옵션 추가 모달 -->
+<div id="productOptionAddModal" class="modal" style="display: none;">
+  <div class="modal-content">
+    <button id="closeProductOptionAddModalBtn" class="close-button">X</button>
+    <h2>옵션 추가</h2>
+
+    <form id="productOptionAddForm">
+      <input type="hidden" name="productId" id="optionProductId" />
+
+      <label>옵션명
+        <input type="text" name="optionName" required />
+      </label><br />
+
+      <label>옵션값
+        <input type="text" name="optionValue" required />
+      </label><br />
+
+      <label>추가 가격
+        <input type="number" name="additionalPrice" value="0" required />
+      </label><br /><br />
+
+      <button type="submit">옵션 등록</button>
+    </form>
+  </div>
+</div>
+
+
+
+<!-- 재고 등록 모달 -->
+<div id="registerStockModal" class="modal" style="display: none;">
+  <div class="modal-content">
+    <button id="closeRegisterModalBtn" class="close-button">X</button>
+    <h2>재고 등록</h2>
+
+    <form id="register-stock-form" class="modal-form" style="display: flex; flex-direction: column; gap: 1rem;">
+      <!-- CSRF 및 Store ID -->
+      <input type="hidden" name="storeId" id="storeId" />
+
+      <!-- 상품 정보 입력 -->
+      <div class="form-group" style="display: flex; flex-direction: column;">
+        <label for="productId">상품 ID</label>
+        <input type="text" id="productId" name="productId" placeholder="상품 ID 입력" required />
+      </div>
+
+      <div class="form-group" style="display: flex; flex-direction: column;">
+        <label for="productName">상품명</label>
+        <input type="text" id="productName" name="productName" placeholder="상품명 입력" required />
+      </div>
+
+      <!-- 수량 -->
+      <div class="form-group" style="display: flex; flex-direction: column;">
+        <label for="quantity">수량</label>
+        <input type="number" id="quantity" name="quantity" required />
+      </div>
+
+      <!-- 재고 레벨 -->
+      <div class="form-group" style="display: flex; flex-direction: column;">
+        <label for="minStockLevel">최소 재고</label>
+        <input type="number" id="minStockLevel" name="minStockLevel" />
+        <label for="maxStockLevel">최대 재고</label>
+        <input type="number" id="maxStockLevel" name="maxStockLevel" />
+        <label for="safetyStockLevel">안전 재고</label>
+        <input type="number" id="safetyStockLevel" name="safetyStockLevel" />
+      </div>
+
+      <!-- 입출고 수량 -->
+      <div class="form-group" style="display: flex; flex-direction: column;">
+        <label for="stockInQuantity">입고 수량</label>
+        <input type="number" id="stockInQuantity" name="stockInQuantity" />
+        <label for="stockOutQuantity">출고 수량</label>
+        <input type="number" id="stockOutQuantity" name="stockOutQuantity" />
+      </div>
+
+      <!-- 숨김 필드 -->
+      <input type="hidden" name="isRestockRequired" value="false" />
+
+      <!-- 제출 버튼 -->
+      <button type="submit" class="modal-submit-btn">등록</button>
+    </form>
+  </div>
+</div>

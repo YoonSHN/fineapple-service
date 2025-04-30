@@ -1,5 +1,10 @@
 // ChatContainer.tsx
 
+import ChatButton from "./ChatButton";
+import LoginPage from "@/components/auth/LoginPage.tsx";
+import ChatWindow from "@/components/chat/ChatWindow.tsx";
+import {useState} from "react";
+
 const ChatContainer = () => {
     const [isChatOpen, setIsChatOpen] = useState(false);
     const [isLoginOpen, setIsLoginOpen] = useState(false);
@@ -19,7 +24,7 @@ const ChatContainer = () => {
 
     return (
         <>
-            <ChatButton onClick={handleChatButtonClick} />
+            <ChatButton onClick={handleChatButtonClick} isOpen={false} />
             {isLoginOpen && <LoginPage onLogin={handleLoginSuccess} />}
             {isChatOpen && <ChatWindow isOpen={true} onClose={handleCloseChat} onLogout={() => {}} />}
         </>

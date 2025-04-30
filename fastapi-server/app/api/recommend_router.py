@@ -5,7 +5,7 @@ from app.services.persnal_user_recommender import personal_recommend
 from app.services.recommender import recommend_similar_items
 
 router = APIRouter(
-    prefix="/api/v1/recommend",
+    prefix="/v1/recommend",
     tags = ["recommend"]
 )
 

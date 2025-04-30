@@ -1,6 +1,6 @@
 package com.fineapple.domain.product.service;
 
-import com.fineapple.Infrastructure.exception.ProductUploadException;
+import com.fineapple.application.exception.ProductUploadException;
 import com.fineapple.domain.product.dto.*;
 import com.fineapple.domain.product.repository.ProductMapper;
 import lombok.RequiredArgsConstructor;

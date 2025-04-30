@@ -1,6 +1,5 @@
 package com.fineapple.domain.logistics_inventory.service;
 
-import com.fineapple.Infrastructure.common.CommonCodeService;
 import com.fineapple.domain.logistics_inventory.dto.*;
 import com.fineapple.domain.logistics_inventory.entity.Stock;
 import com.fineapple.domain.logistics_inventory.entity.StockChangeHistory;

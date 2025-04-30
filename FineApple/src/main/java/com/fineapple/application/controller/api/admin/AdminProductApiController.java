@@ -2,7 +2,7 @@ package com.fineapple.application.controller.api.admin;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fineapple.Infrastructure.exception.ProductUploadException;
+import com.fineapple.application.exception.ProductUploadException;
 import com.fineapple.domain.product.dto.*;
 import com.fineapple.domain.product.service.ProductImgService;
 import com.fineapple.domain.product.service.ProductService;
@@ -16,7 +16,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.DispatcherServlet;
 
 import java.util.List;
 import java.util.Locale;

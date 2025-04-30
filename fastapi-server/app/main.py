@@ -35,9 +35,9 @@ app.add_middleware(
 )
 
 app.include_router(chat_router, prefix="/api")
-app.include_router(auth_router)
-app.include_router(predict_router)
-app.include_router(recommend_router)
+app.include_router(auth_router, prefix="/api")
+app.include_router(predict_router, prefix="/api")
+app.include_router(recommend_router, prefix="/api")
 # app.include_router(agent_router, prefix="/api") #미사용
 
 

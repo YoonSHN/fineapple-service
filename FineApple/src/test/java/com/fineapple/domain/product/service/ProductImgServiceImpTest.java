@@ -1,9 +1,9 @@
 package com.fineapple.domain.product.service;
 
-import com.fineapple.Infrastructure.exception.ProductUploadException;
+import com.fineapple.application.exception.ProductUploadException;
 import com.fineapple.domain.product.dto.*;
 import com.fineapple.domain.product.repository.ProductMapper;
-import com.fineapple.exceptionTest.ExceptionTest;
+import com.fineapple.config.ExceptionTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

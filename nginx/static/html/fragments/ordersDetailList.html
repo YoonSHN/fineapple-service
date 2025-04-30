@@ -1,0 +1,73 @@
+<div th:fragment="ordersList" data-page="orderdetaillist">
+    <main class="main-content">
+        <header class="main-header-dashboard">
+            <h1>주문 상세 목록</h1>
+            <div class="header-actions">
+                <!-- 알림 -->
+                <details class="notif-menu">
+                    <summary class="notif-btn">
+                        <span class="material-symbols-outlined">notifications</span>
+                        <span class="notif-dot"></span>
+                    </summary>
+                    <div class="notif-dropdown">
+                        <div class="notif-item">새 주문이 들어왔습니다.</div>
+                        <div class="notif-item">상품 재고가 부족합니다.</div>
+                        <div class="notif-item">결제가 완료되었습니다.</div>
+                    </div>
+                </details>
+                <!-- 사용자 메뉴 -->
+                <div class="user-menu">
+                    <details class="user-menu__details">
+                        <summary class="user-menu__summary">
+                            <div class="user-menu__avatar"
+                                 th:if="${#authorization.expression('isAuthenticated()')}"
+                                 th:text="${#strings.substring(#authentication.name, 0, 1)}">
+                                JD
+                            </div>
+                            <span class="user-menu__name" th:if="${#authorization.expression('isAuthenticated()')}"
+                                  th:text="${#strings.substringBefore(#authentication.name, '@')}">John Doe</span>
+                        </summary>
+                        <div class="user-menu__dropdown">
+                            <a href="#" class="user-menu__item">My Profile</a>
+                            <a href="#" class="user-menu__item">Settings</a>
+                            <div class="user-menu__divider"></div>
+                            <form id="logout-form" th:action="@{/logout}" method="post">
+                                <button type="submit" class="user-menu__item">Logout</button>
+                            </form>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </header>
+
+        <section class="orders-panel">
+            <div class="orders-table-wrap">
+                <table class="orders-table">
+                    <thead>
+                    <tr>
+                        <th>주문 코드</th>
+                        <th>주문 상세 ID</th>
+                        <th>이미지</th>
+                        <th>전화번호</th>
+                        <th>이름</th>
+                        <th>수량</th>
+                        <th>가격</th>
+                        <th>할인 가격</th>
+                        <th>쿠폰 적용</th>
+                        <th>추가 가격</th>
+                        <th>추가사항</th>
+                        <th>상품 상태</th>
+                        <th>버튼</th>
+                    </tr>
+                    </thead>
+                    <tbody id="orders-body"></tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <button id="prevPage">이전</button>
+                <span id="pageNumbers"></span>
+                <button id="nextPage">다음</button>
+            </div>
+        </section>
+    </main>
+</div>

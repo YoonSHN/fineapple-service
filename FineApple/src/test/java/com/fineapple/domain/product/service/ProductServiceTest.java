@@ -1,13 +1,13 @@
 package com.fineapple.domain.product.service;
 
-import com.fineapple.Infrastructure.exception.ProductNotFoundException;
-import com.fineapple.Infrastructure.exception.ProductUploadException;
+import com.fineapple.application.exception.ProductNotFoundException;
+import com.fineapple.application.exception.ProductUploadException;
 import com.fineapple.domain.product.dto.ProductAdminDto;
 import com.fineapple.domain.product.dto.ProductDetailDto;
 import com.fineapple.domain.product.dto.ProductOptionDto;
 import com.fineapple.domain.product.dto.ProductSearchParam;
 import com.fineapple.domain.product.repository.ProductMapper;
-import com.fineapple.exceptionTest.ExceptionTest;
+import com.fineapple.config.ExceptionTest;
 import com.github.pagehelper.PageInfo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

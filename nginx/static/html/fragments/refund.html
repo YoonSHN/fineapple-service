@@ -1,0 +1,160 @@
+<div th:fragment="refund" data-page="refund">
+    <main class="main-content">
+        <header class="main-header">
+            <h1>환불 요청 목록</h1>
+            <div class="header-actions">
+                <!-- 알림 -->
+                <details class="notif-menu">
+                    <summary class="notif-btn">
+                        <span class="material-symbols-outlined">notifications</span>
+                        <span class="notif-dot"></span>
+                    </summary>
+                    <div class="notif-dropdown">
+                        <div class="notif-item">새 주문이 들어왔습니다.</div>
+                        <div class="notif-item">상품 재고가 부족합니다.</div>
+                        <div class="notif-item">결제가 완료되었습니다.</div>
+                    </div>
+                </details>
+                <!-- 사용자 메뉴 -->
+                <div class="user-menu">
+                    <details class="user-menu__details">
+                        <summary class="user-menu__summary">
+                            <div class="user-menu__avatar"
+                                 th:if="${#authorization.expression('isAuthenticated()')}"
+                                 th:text="${#strings.substring(#authentication.name, 0, 1)}">
+                                JD
+                            </div>
+                            <span class="user-menu__name" th:if="${#authorization.expression('isAuthenticated()')}"
+                                  th:text="${#strings.substringBefore(#authentication.name, '@')}">John Doe</span>
+                        </summary>
+                        <div class="user-menu__dropdown">
+                            <a href="#" class="user-menu__item">My Profile</a>
+                            <a href="#" class="user-menu__item">Settings</a>
+                            <div class="user-menu__divider"></div>
+                            <form id="logout-form" th:action="@{/logout}" method="post">
+                                <button type="submit" class="user-menu__item">Logout</button>
+                            </form>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </header>
+
+        <header class="search-header">
+            <div class="header-actions">
+                <div class="search-box" style="display: flex; align-items: center; gap: 0.5rem;">
+                    <select name="refundStatus" style="width: 80px;">
+                        <option value="">전체</option>
+                        <option value="OR0301">환불 대기 </option>
+                        <option value="OR0302">환불 승인</option>
+                        <option value="OR0303">환불 거절 </option>
+                        <option value="OR0304">환불 완료</option>
+                        <option value="OR0304">환불 취소</option>
+                    </select>
+                    <select name="sortDir" style="width: 100px;">
+                        <option value="desc">내림차순</option>
+                        <option value="asc">오름차순</option>
+                    </select>
+                    <input type="date" name="startDate" placeholder="시작일" style="width: 130px;"/>
+                    <input type="date" name="endDate" placeholder="종료일" style="width: 130px;"/>
+                    <input type="text" name="paymentId" placeholder="결제아이디검색" style="width: 150px;"/>
+                    <button id="refund-search-btn" class="btn-add">
+                        <span class="btn-icon material-icons">search</span>검색
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <section class="refund-panel">
+            <div class="refund-table-wrap">
+                <table class="refund-table">
+                    <thead>
+                    <tr>
+                        <th>환불 ID</th>
+                        <th>환불 상태</th>
+                        <th>결제 ID</th>
+                        <th>요청일</th>
+                        <th>승인일</th>
+                        <th>환불 금액</th>
+                        <th>환불 사유</th>
+                        <th>PG 응답 코드</th>
+                        <th>거절 사유</th>
+                        <th>상세 보기</th>
+                    </tr>
+                    </thead>
+                    <tbody id="refund-body">
+
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <button id="refund-prevPage">이전</button>
+                <span id="refund-pageNumbers"></span>
+                <button id="refund-nextPage">다음</button>
+            </div>
+        </section>
+    </main>
+</div>
+
+<div id="refundDetailModal" class="modal">
+    <div class="modal-content">
+        <button id="closeRefundDetailModalBtn" class="close-button">X</button>
+
+        <h2>환불 정보</h2>
+        <table class="modal-detail-table">
+            <tbody>
+            <tr>
+                <th>환불 ID</th>
+                    <td id="modalRefundId"></td>
+                <th>환불 상태</th>
+                <td id="modalRefundStatus"></td>
+            </tr>
+            <tr>
+                <th>결제 ID</th>
+                <td id="modalPaymentId"></td>
+                <th>환불 금액</th>
+                <td id="modalRefundTotalAmount"></td>
+            </tr>
+            <tr>
+                <th>요청 일시</th>
+                <td id="modalRequestedAt"></td>
+                <th>승인 일시</th>
+                <td id="modalApprovedAt"></td>
+            </tr>
+            <tr>
+                <th>환불 사유</th>
+                <td colspan="3" id="modalRefundReason"></td>
+            </tr>
+            <tr>
+                <th>PG 응답 코드</th>
+                <td id="modalPgResponseCode"></td>
+                <th>거절 사유</th>
+                <td id="modalRefundFailReason"></td>
+            </tr>
+            </tbody>
+        </table>
+
+        <h2 style="margin-top: 30px;">환불 처리 이력</h2>
+        <table class="modal-detail-table">
+            <thead>
+            <tr>
+                <th>이력 ID</th>
+                <th>이슈 상태</th>
+                <th>승인 일시</th>
+                <th>승인번호</th>
+                <th>요청 금액</th>
+                <th>남은 금액</th>
+                <th>은행명</th>
+                <th>은행 코드</th>
+            </tr>
+            </thead>
+            <tbody id="refundDetailHistoryBody">
+
+            </tbody>
+        </table>
+
+        <button id="toggleRefundStatusBtn" class="btn-add" style="margin-top: 20px;">
+            환불 취소
+        </button>
+    </div>
+</div>
