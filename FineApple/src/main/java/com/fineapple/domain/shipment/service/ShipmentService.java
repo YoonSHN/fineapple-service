@@ -1,8 +1,7 @@
 package com.fineapple.domain.shipment.service;
 
-import com.fineapple.Infrastructure.common.CommonCode;
-import com.fineapple.Infrastructure.common.CommonCodeRepository;
-import com.fineapple.Infrastructure.common.CommonCodeService;
+
+import com.fineapple.application.common.CommonCodeService;
 import com.fineapple.domain.order_payment.service.OrderService;
 import com.fineapple.domain.shipment.dto.ShipmentDetailDto;
 import com.fineapple.domain.shipment.dto.ShipmentDto;

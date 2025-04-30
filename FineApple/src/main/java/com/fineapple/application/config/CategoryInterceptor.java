@@ -21,6 +21,10 @@ public class CategoryInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        String url = request.getRequestURI();
+        if (url.startsWith("/api")) {
+            return true;
+        }
         List<CategoryDto> mainCategories = categoryService.getCategory();
         request.setAttribute("mainCategories", mainCategories);
         return true;

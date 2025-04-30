@@ -1,0 +1,78 @@
+<div th:fragment="analyticsReport" data-page="analyticsReport" xmlns:sec="http://www.w3.org/1999/xhtml">
+    <main class="main-content">
+        <header class="main-header">
+            <h1>통계</h1>
+
+
+
+
+            <div class="header-actions">
+                <details class="notif-menu">
+                    <summary class="notif-btn">
+                        <span class="material-symbols-outlined">notifications</span>
+                        <span class="notif-dot"></span>
+                    </summary>
+                    <div class="notif-dropdown">
+                        <div class="notif-item">새 주문이 들어왔습니다.</div>
+                        <div class="notif-item">상품 재고가 부족합니다.</div>
+                        <div class="notif-item">결제가 완료되었습니다.</div>
+                    </div>
+                </details>
+                <div class="user-menu">
+                    <details class="user-menu__details">
+                        <summary class="user-menu__summary">
+                            <div class="user-menu__avatar"
+                                 th:if="${#authorization.expression('isAuthenticated()')}"
+                                 th:text="${#strings.substring(#authentication.name, 0, 1)}">
+                                JD
+                            </div>
+                            <span class="user-menu__name" th:if="${#authorization.expression('isAuthenticated()')}"
+                                  th:text="${#strings.substringBefore(#authentication.name, '@')}">John Doe</span>
+                        </summary>
+                        <div class="user-menu__dropdown">
+                            <a href="#" class="user-menu__item">My Profile</a>
+                            <a href="#" class="user-menu__item">Settings</a>
+                            <div class="user-menu__divider"></div>
+                            <form id="logout-form" th:action="@{/logout}" method="post">
+                                <button type="submit" class="user-menu__item">Logout</button>
+                            </form>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </header>
+
+
+        <div class="chart-container" style="margin-top: 2rem; margin-bottom: 2rem">
+            <canvas id="salesTrendChart"></canvas>
+        </div>
+
+
+        <section class="kpi-section" style="display: flex; gap: 1rem; margin-top: 1rem;">
+            <div class="kpi-card">
+                <div class="kpi-label">이번 달 매출</div>
+                <div class="kpi-value" id="current-sales">-</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">다음 달 예측 매출</div>
+                <div class="kpi-value" id="predicted-sales">-</div>
+            </div>
+        </section>
+
+
+        <div class="chart-container" style="margin-top: 2rem; margin-bottom: 2rem">
+            <canvas id="dailyRevenueChart"></canvas>
+        </div>
+        <section class="kpi-section" style="display: flex; gap: 1rem; margin-top: 1rem;">
+            <div class="kpi-card">
+                <div class="kpi-label">오늘 매출</div>
+                <div class="kpi-value" id="today-revenue">-</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">내일 예측</div>
+                <div class="kpi-value" id="tomorrow-revenue">-</div>
+            </div>
+        </section>
+
+    </main>
+</div>

@@ -1,10 +1,11 @@
 package com.fineapple.domain.user.service;
 
 
-import com.fineapple.Infrastructure.common.CommonCodeService;
-import com.fineapple.Infrastructure.exception.DataUpdateException;
-import com.fineapple.Infrastructure.exception.InvalidUserStatusException;
-import com.fineapple.Infrastructure.exception.UserNotFoundException;
+
+import com.fineapple.application.common.CommonCodeService;
+import com.fineapple.application.exception.DataUpdateException;
+import com.fineapple.application.exception.InvalidUserStatusException;
+import com.fineapple.application.exception.UserNotFoundException;
 import com.fineapple.domain.user.dto.*;
 import com.fineapple.domain.user.entity.User;
 import com.fineapple.domain.user.repository.UserMapper;

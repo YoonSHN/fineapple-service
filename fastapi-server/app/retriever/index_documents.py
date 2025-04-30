@@ -3,6 +3,7 @@ from langchain_upstage import UpstageEmbeddings
 from langchain_community.document_loaders import UnstructuredMarkdownLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import Chroma
+from chromadb.config import Settings
 import os
 from dotenv import load_dotenv
 load_dotenv()
@@ -24,6 +25,17 @@ def index_documents():
     chunks = splitter.split_documents(docs)
 
     vectorstore_path = os.path.join(base_dir, "data/vectorstore")
+
+
+    client_settings = Settings(
+        anonymized_telemetry=False,
+        settings={
+            "hnsw:configuration": {
+                "num_threads": 4
+            }
+        }
+    )
+
     vectordb = Chroma.from_documents(
         documents=chunks,
         embedding=embedding,

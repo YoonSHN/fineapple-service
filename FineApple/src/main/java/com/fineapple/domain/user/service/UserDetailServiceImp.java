@@ -1,7 +1,7 @@
 package com.fineapple.domain.user.service;
 
 
-import com.fineapple.Infrastructure.exception.*;
+import com.fineapple.application.exception.*;
 import com.fineapple.domain.user.dto.UserDetailDto;
 import com.fineapple.domain.user.dto.UserRegistrationDto;
 import com.fineapple.domain.user.dto.UserUpdateDto;

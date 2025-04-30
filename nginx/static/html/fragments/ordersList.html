@@ -1,0 +1,144 @@
+<div th:fragment="ordersList" data-page="orderlist">
+    <main class="main-content">
+        <header class="main-header">
+            <h1>주문 목록</h1>
+            <div class="header-actions">
+                <!-- 알림 -->
+                <details class="notif-menu">
+                    <summary class="notif-btn">
+                        <span class="material-symbols-outlined">notifications</span>
+                        <span class="notif-dot"></span>
+                    </summary>
+                    <div class="notif-dropdown">
+                        <div class="notif-item">새 주문이 들어왔습니다.</div>
+                        <div class="notif-item">상품 재고가 부족합니다.</div>
+                        <div class="notif-item">결제가 완료되었습니다.</div>
+                    </div>
+                </details>
+                <!-- 사용자 메뉴 -->
+                <div class="user-menu">
+                    <details class="user-menu__details">
+                        <summary class="user-menu__summary">
+                            <div class="user-menu__avatar"
+                                 th:if="${#authorization.expression('isAuthenticated()')}"
+                                 th:text="${#strings.substring(#authentication.name, 0, 1)}">
+                                JD
+                            </div>
+                            <span class="user-menu__name" th:if="${#authorization.expression('isAuthenticated()')}"
+                                  th:text="${#strings.substringBefore(#authentication.name, '@')}">John Doe</span>
+                        </summary>
+                        <div class="user-menu__dropdown">
+                            <a href="#" class="user-menu__item">My Profile</a>
+                            <a href="#" class="user-menu__item">Settings</a>
+                            <div class="user-menu__divider"></div>
+                            <form id="logout-form" th:action="@{/logout}" method="post">
+                                <button type="submit" class="user-menu__item">Logout</button>
+                            </form>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </header>
+
+        <header class="search-header">
+            <div class="header-actions">
+                <div class="filter-options">
+                    <select id="orderStatusFilter">
+                        <option value="">전체 상태</option>
+                        <option value="OR0101">주문 접수</option>
+                        <option value="OR0102">주문 처리 완료</option>
+                        <option value="OR0201">결제 대기</option>
+                        <option value="OR0202">결제 완료</option>
+                        <option value="OR0204">결제 실패</option>
+                        <option value="SH0101">배송 준비 중</option>
+                        <option value="SH0102">배송 중</option>
+                        <option value="SH0103">배송 완료</option>
+                        <option value="OR0104">주문 취소 완료</option>
+                        <option value="OR0403">취소됨</option>
+                    </select>
+                    <input type="date" id="startDate" placeholder="시작일" />
+                    <input type="date" id="endDate" placeholder="종료일" />
+
+                    <select id="sortDirectionFilter">
+                        <option value="desc">내림차순</option>
+                        <option value="asc">오름차순</option>
+                    </select>
+                </div>
+
+                    <select id="search-key">
+                        <option value="orderId">주문 ID</option>
+                        <option value="orderCode" selected>주문 코드</option>
+                        <option value="tel">전화번호</option>
+                    </select>
+                <div class="search-box">
+                    <input id="search-value" type="text" placeholder="검색..." />
+                    <span class="search-icon material-icons">search</span>
+                </div>
+
+                <button id="filterBtn" class="btn-add">
+                    <span class="btn-icon material-icons">search</span>검색
+                </button>
+            </div>
+        </header>
+
+        <section class="orders-panel">
+            <div class="orders-table-wrap">
+                <table class="orders-table">
+                    <thead>
+                    <tr>
+                        <th>주문 ID</th>
+                        <th>주문 코드</th>
+                        <th>번호</th>
+                        <th>총 금액</th>
+                        <th>주문 상태</th>
+                        <th>취소여부</th>
+                        <th>주문일</th>
+                        <th>주문 변경일</th>
+                        <th>버튼</th>
+                    </tr>
+                    </thead>
+                    <tbody id="orders-body"></tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <button id="prevPage">이전</button>
+                <span id="pageNumbers"></span>
+                <button id="nextPage">다음</button>
+            </div>
+        </section>
+    </main>
+</div>
+
+
+<div id="orderStatusModal" class="modal"  style="display: none;">
+    <div class="modal-content">
+
+        <button id="closeStatusModalBtn" class="close-button">X</button>
+
+        <h2>주문 상태 이력</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>주문상태 ID</th>
+                <th>주문코드</th>
+                <th>주문상태</th>
+                <th>결제상태</th>
+                <th>업데이트일시</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<script>
+    function closeOrderStatusModal() {
+        const modalEl = document.getElementById('orderStatusModal');
+        if (modalEl) {
+            modalEl.style.display = 'none';
+        }
+    }
+</script>

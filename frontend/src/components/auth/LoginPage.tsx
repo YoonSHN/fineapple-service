@@ -32,7 +32,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
     setError("");
 
     try {
-      const response = await fetch("http://localhost:8000/login", {
+      const response = await fetch("/fastapi/api/login", {
         method: "POST",
         credentials: "include", // 세션 쿠키 포함
         headers: {

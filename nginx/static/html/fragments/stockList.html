@@ -1,0 +1,160 @@
+<div th:fragment="stockList" data-page="stocklist">
+    <main class="main-content">
+        <header class="main-header">
+            <h1>스토어 재고 목록</h1>
+            <div class="header-actions">
+                <div class="user-menu">
+                    <details class="user-menu__details">
+                        <summary class="user-menu__summary">
+                            <div class="user-menu__avatar"
+                                 th:if="${#authorization.expression('isAuthenticated()')}"
+                                 th:text="${#strings.substring(#authentication.name, 0, 1)}">
+                                JD
+                            </div>
+                            <span class="user-menu__name" th:if="${#authorization.expression('isAuthenticated()')}"
+                                  th:text="${#strings.substringBefore(#authentication.name, '@')}">John Doe</span>
+                        </summary>
+                        <div class="user-menu__dropdown">
+                            <a href="#" class="user-menu__item">My Profile</a>
+                            <a href="#" class="user-menu__item">Settings</a>
+                            <div class="user-menu__divider"></div>
+                            <a href="#" class="user-menu__item" id="logout-link">Logout</a>
+                            <form id="logout-form" th:action="@{/logout}" method="post">
+                                <button type="submit" class="user-menu__item">Logout</button>
+                            </form>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </header>
+
+        <section class="inventory-panel">
+            <div class="inventory-table-wrap">
+
+                <!-- ✅ 재고 등록 버튼 -->
+                <div class="stock-form">
+                    <button id="openRegisterModalBtn" style="margin-bottom: 10px;">재고 등록</button>
+                </div>
+
+                <table class="inventory-table">
+                    <thead>
+                    <tr>
+                        <th>상품 ID</th>
+                        <th>수량</th>
+                        <th>재고 상태</th>
+                        <th>코드 이름</th>
+                        <th>최종 수정일</th>
+                        <th>재입고 필요</th>
+                        <th>상세 보기</th>
+                    </tr>
+                    </thead>
+                    <tbody id="inventory-body">
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</div>
+
+<!-- ✅ 재고 등록 모달 -->
+<div id="registerStockModal" class="modal" style="display: none;">
+    <div class="modal-content" style="padding: 2rem; width: 400px;">
+        <button id="closeRegisterModalBtn" class="close-button">X</button>
+        <div style="display: flex; justify-content: space-between; align-items: baseline;">
+            <h2 style="margin-bottom: 0.5rem;">재고 등록</h2>
+            <span style="font-size: 0.8rem; color: #cc0000;">⚠️ 안전재고는 최소 재고보다 작아야 합니다.</span>
+        </div>
+        <form id="register-stock-form" style="display: flex; flex-direction: column; gap: 1rem;">
+            <input type="hidden" name="storeId" id="storeId" />
+
+            <label for="productSelect">상품 선택</label>
+            <select name="productId" id="productSelect" required style="padding: 0.5rem;">
+                <option value="">상품을 선택하세요</option>
+                <!-- JS로 채워짐 -->
+            </select>
+
+            <label>수량</label>
+            <input type="number" name="quantity" required />
+
+            <label>최소 재고</label>
+            <input type="number" name="minStockLevel" />
+
+            <label>최대 재고</label>
+            <input type="number" name="maxStockLevel" />
+
+            <label>안전 재고</label>
+            <input type="number" name="safetyStockLevel" />
+
+            <input type="hidden" name="isRestockRequired" value="false" />
+            <button type="submit" class="modal-submit-btn" style="margin-top: 1rem;">등록</button>
+        </form>
+    </div>
+</div>
+
+<div id="stockDetailModal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <button id="closeStockDetailModalBtn" class="close-button">X</button>
+        <h2>재고 상세 정보</h2>
+        <table>
+            <tr><th>스토어 ID</th><td id="detailStoreId"></td></tr>
+            <tr><th>상품 ID</th><td id="detailProductId"></td></tr>
+
+            <tr>
+                <th>수량</th>
+                <td>
+                    <span id="detailQuantity"></span>
+                    <input type="number" id="inputQuantity" style="display: none; width: 100%;" />
+                </td>
+            </tr>
+            <tr>
+                <th>재고 상태</th>
+                <td>
+                    <span id="detailStockStatus"></span>
+                    <input type="text" id="inputStockStatus" style="display: none; width: 100%;" />
+                </td>
+            </tr>
+            <tr>
+                <th>최소 재고량</th>
+                <td>
+                    <span id="detailMinStockLevel"></span>
+                    <input type="number" id="inputMinStockLevel" style="display: none; width: 100%;" />
+                </td>
+            </tr>
+            <tr>
+                <th>최대 재고량</th>
+                <td>
+                    <span id="detailMaxStockLevel"></span>
+                    <input type="number" id="inputMaxStockLevel" style="display: none; width: 100%;" />
+                </td>
+            </tr>
+            <tr>
+                <th>안전 재고량</th>
+                <td>
+                    <span id="detailSafetyStockLevel"></span>
+                    <input type="number" id="inputSafetyStockLevel" style="display: none; width: 100%;" />
+                </td>
+            </tr>
+
+            <tr><th>입고 수량</th><td id="detailStockInQuantity"></td></tr>
+            <tr><th>출고 수량</th><td id="detailStockOutQuantity"></td></tr>
+            <tr><th>최근 입고일</th><td id="detailLastRestockDate"></td></tr>
+            <tr><th>최초 입고일</th><td id="detailFirstStockInDate"></td></tr>
+            <tr><th>최근 출고일</th><td id="detailLastStockOutDate"></td></tr>
+            <tr><th>재입고 필요 여부</th><td id="detailIsRestockRequired"></td></tr>
+
+            <!-- ✅ 마지막 수정 시간 -->
+            <tr>
+                <th>마지막 수정 시간</th>
+                <td><span id="detailUpdatedAt"></span></td>
+            </tr>
+
+            <!-- 버튼 -->
+            <tr>
+                <td colspan="2" style="text-align:right;">
+                    <button id="editStockBtn">수정</button>
+                    <button id="saveStockBtn" style="display:none;">저장</button>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>

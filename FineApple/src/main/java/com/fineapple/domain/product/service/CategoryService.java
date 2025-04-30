@@ -1,8 +1,7 @@
 package com.fineapple.domain.product.service;
 
-import com.fineapple.Infrastructure.exception.NotFoundException;
+import com.fineapple.application.exception.NotFoundException;
 import com.fineapple.domain.product.dto.CategoryDto;
-import com.fineapple.domain.product.entity.Category;
 import com.fineapple.domain.product.repository.CategoryMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;

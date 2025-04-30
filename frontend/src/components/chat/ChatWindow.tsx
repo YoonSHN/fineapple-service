@@ -33,7 +33,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ isOpen, onClose, onLogout }) =>
         if (isOpen) {
             const fetchIntroMessage = async () => {
                 try {
-                    const res = await fetch('http://localhost:8000/api/chat/intro', {
+                    const res = await fetch('/fastapi/api/chat/intro', {
                         method: 'GET',
                         credentials: 'include',
                         headers: {
@@ -98,7 +98,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ isOpen, onClose, onLogout }) =>
         setIsBotTyping(true);
 
         try {
-            const res = await fetch('http://localhost:8000/api/chat', {
+            const res = await fetch('/fastapi/api/chat', {
                 method: 'POST',
                 credentials: 'include',
                 headers: {
@@ -169,7 +169,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ isOpen, onClose, onLogout }) =>
             >
                 <ChatHeader onClose={onClose} onLogout={onLogout} />
                 <ChatMessages messages={messages} isBotTyping={isBotTyping} />
-                <MessageInput onSendMessage={handleSendMessage} isOpen={isOpen} />
+                <MessageInput onSendMessage={handleSendMessage} isOpen={isOpen} isLoggedIn={false} />
             </div>
 
             <ChatModals

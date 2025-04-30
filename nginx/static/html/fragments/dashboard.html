@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<body>
+<div th:fragment="dashboard" data-page="dashboard">
+  <main class="main-content">
+    <header class="main-header-dashboard">
+      <h1>대시보드</h1>
+      <div class="header-actions">
+        <div class="search-box">
+          <input type="text" placeholder="검색..." />
+          <span class="search-icon material-icons">search</span>
+        </div>
+        <details class="notif-menu">
+          <summary class="notif-btn">
+            <span class="material-symbols-outlined">notifications</span>
+            <span class="notif-dot"></span>
+          </summary>
+          <div class="notif-dropdown">
+            <div class="notif-item">새 주문이 들어왔습니다.</div>
+            <div class="notif-item">상품 재고가 부족합니다.</div>
+            <div class="notif-item">결제가 완료되었습니다.</div>
+          </div>
+        </details>
+        <div class="user-menu">
+          <details class="user-menu__details">
+            <summary class="user-menu__summary">
+              <div class="user-menu__avatar"
+                   th:if="${#authorization.expression('isAuthenticated()')}"
+                   th:text="${#strings.substring(#authentication.name, 0, 1)}">
+                JD
+              </div>
+              <span class="user-menu__name" th:if="${#authorization.expression('isAuthenticated()')}"
+                    th:text="${#strings.substringBefore(#authentication.name, '@')}">John Doe</span>
+            </summary>
+            <div class="user-menu__dropdown">
+              <a href="#" class="user-menu__item">My Profile</a>
+              <a href="#" class="user-menu__item">Settings</a>
+              <div class="user-menu__divider"></div>
+              <form id="logout-form" th:action="@{/logout}" method="post">
+                <button type="submit" class="user-menu__item">Logout</button>
+              </form>
+            </div>
+          </details>
+        </div>
+      </div>
+    </header>
+
+    <!-- Stats Cards -->
+    <section class="stats-grid">
+      <div class="stats-card">
+        <div class="stats-info">
+          <p class="stats-label">총 매출</p>
+          <h3 class="stats-value" id="total-sales">$0</h3>
+          <p class="stats-trend positive" id="sales-trend">
+            <span class="material-icons trend-icon">trending_up</span>
+            이번 주 +18%
+          </p>
+        </div>
+        <div class="stats-icon bg-blue">
+          <span class="material-icons">payments</span>
+        </div>
+      </div>
+      <div class="stats-card">
+        <div class="stats-info">
+          <p class="stats-label">총 주문수</p>
+          <h3 class="stats-value" id="order-count">0</h3>
+          <p class="stats-trend positive" id="order-trend">
+            <span class="material-icons trend-icon">trending_up</span>
+            이번 주 +5%
+          </p>
+        </div>
+        <div class="stats-icon bg-purple">
+          <span class="material-icons">shopping_cart</span>
+        </div>
+      </div>
+      <div class="stats-card">
+        <div class="stats-info">
+          <p class="stats-label">방문자 수</p>
+          <h3 class="stats-value" id="visitors">0</h3>
+          <p class="stats-trend neutral" id="visitor-trend">
+            <span class="material-icons trend-icon">trending_flat</span>
+            이번 주 0%
+          </p>
+        </div>
+        <div class="stats-icon bg-green">
+          <span class="material-icons">group</span>
+        </div>
+      </div>
+      <div class="stats-card">
+        <div class="stats-info">
+          <p class="stats-label">재고 부족 상품</p>
+          <h3 class="stats-value" id="low-stock">0</h3>
+          <p class="stats-trend negative" id="stock-trend">
+            <span class="material-icons trend-icon">trending_down</span>
+            주의 요함
+          </p>
+        </div>
+        <div class="stats-icon bg-red">
+          <span class="material-icons">warning</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sales & Orders -->
+    <section class="sales-orders">
+      <div class="sales-panel">
+        <div class="panel-header">
+          <h2>매출 개요</h2>
+          <select class="panel-select">
+            <option>지난 7일</option>
+            <option>지난 30일</option>
+            <option>최근 3개월</option>
+          </select>
+        </div>
+        <div class="panel-body">
+          <canvas id="salesChart" style="width:100%; height:300px;"></canvas>
+        </div>
+      </div>
+
+      <div class="orders-panel">
+        <div class="panel-header">
+          <h2>최근 주문</h2>
+          <a href="/orders/list" class="panel-link">전체 보기</a>
+        </div>
+        <div class="orders-table-wrap">
+          <table class="orders-table">
+            <thead>
+            <tr>
+              <th>주문 ID</th>
+              <th>전화번호</th>
+              <th>상태</th>
+              <th>금액</th>
+            </tr>
+            </thead>
+            <tbody id="orders-body">
+            <!-- 서버 사이드 기본 데이터 렌더링 추가예정 -->
+
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+
+    <section class="stores-panel">
+      <div class="stores-table-wrap">
+        <table class="stores-table">
+          <thead>
+          <tr>
+            <th>스토어 ID</th>
+            <th>스토어 이름</th>
+            <th>위치</th>
+            <th>스토어 번호</th>
+            <th>상세 재고 보기</th>
+          </tr>
+          </thead>
+          <tbody id="inventory-body">
+
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    </section>
+  </main>
+</div>
+</body>
+</html>

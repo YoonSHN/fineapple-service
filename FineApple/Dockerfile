@@ -1,5 +1,12 @@
 FROM eclipse-temurin:21-jdk-alpine
 
-COPY target/fineapple-0.0.1-SNAPSHOT.jar app.jar
 
-ENTRYPOINT ["java", "-jar", "/app.jar"]
+WORKDIR /app
+
+
+COPY mvnw pom.xml /app/
+COPY .mvn /app/.mvn
+
+EXPOSE 8080
+
+CMD ["./mvnw", "spring-boot:run"]

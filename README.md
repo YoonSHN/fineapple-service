@@ -6,41 +6,14 @@
 
 마치 애플 로고에서 한 입 베어먹은 형태처럼,'파인 애플'은 과학적이고 세련된 접근을 통해 고객에게 깊이 있는 제품 경험을 선사하는 것을 목표로 합니다.
 
-## 토이 프로젝트3 기능 구현 과정 및 결과
-
-### 시스템 아키텍쳐
-![FineApple_시스템 아키텍쳐](https://github.com/user-attachments/assets/6abc614f-a5c3-4df0-a1b9-f23baafbab0c)
-
-
-### Fast API 기반 챗봇 서버 구축(필수)
-|완료여부|항목|자료|
-|--|--|--|
-|✅|Fast API 프레임워크를 이용해 기본 챗봇 서버 구축|[FastAPI 기반 RESTful API 서버 구성 완료](/fastapi-server/app/main.py)
-|✅|OpenAI API를 연동하여 사용자의 요청에 따라 챗봇의 적절한 응답 반환|[사용자 질문에 대해 LLM을 통해 의도 분류 및 응답 생성](/fastapi-server/app/services)
-|✅|챗봇 서버의 기본 구조 및 라우팅 설계|[FastAPI 앱 구성 및 라우팅 등록](/fastapi-server/app/main.py)
-
-### 챗봇 기능 구현(필수)
-|완료여부|항목|자료|
-|--|--|--|
-|✅|쇼핑몰의 FAQ와 공지사항을 기반으로 챗봇이 사용자의 질문에 답할 수 있도록 데이터셋 구축|[FAQ와 공지사항 등에 대한 md파일 제작](/fastapi-server/data/docs)
-|✅|사용자 질문에 대해 챗봇이 응답할 수 있도록 OpenAI API를 활용한 질문 응답 기능 구현|[intent 기반 쿼리 처리 + LLM 응답으로 사용자에게 전달](/fastapi-server/app//services/chat_logic.py)
-|✅|챗봇이 사용자의 주문 상태 조회나 간단한 상품 검색을 지원하도록 기능 확장|[/orders, /products 관련 내부 로직 구현](/fastapi-server/app/services/order_service.py)
-
-### 자바 스프링 서버와의 통신 및 데이터 연동(권장)
-|완료여부|항목|자료|
-|--|--|--|
-|✅|자바 스프링 서버와 Fast API 챗봇 서버 간의 RESTful API 연동|[JWT 인증 기반 Spring → FastAPI 사용자 ID 연동](/fastapi-server/app/services/auth_service.py)
-|✅|사용자 정보, 주문 상태, 상품 정보 등의 데이터를 자바 스프링 서버에서 Fast API 챗봇 서버로 안전하게 전달하기 위한 API 설계|[Spring 서버와 동일한 MySQL DB → FastAPI에서 MyBatis로 접근](/fastapi-server/app/database/db.py)
-
-
-## 토이1&2 기능 구현 과정 및 결과
+## 기능 구현 과정 및 결과
 
 ### 프로젝트 구현 및 실행 조건
 |완료여부|항목|자료|
 |--|--|--|
 |✅|ERD툴을 이용한 논리 모델링 작성|![ERD](images/ERD전체모델링.png)
 |✅|물리모델링 & 테이블 생성 및 데이터 입력 스크립트 작성|[스크립트 디렉토리](/src/main/resources/db/migration)
-|✅|mysql도커|[MYSQL 8.4.3을 사용하는 도커](/docker-compose.yml)
+|✅|mysql도커|[MYSQL 8.4.3을 사용하는 도커](/docker-compose.prod.yml)
 
 ### 프로젝트 요구 사항(필수)
 기본 정보 테이블 & 행위 테이블 설계

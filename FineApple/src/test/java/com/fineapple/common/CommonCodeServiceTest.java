@@ -1,7 +1,8 @@
 package com.fineapple.common;
 
-import com.fineapple.Infrastructure.common.CommonCode;
-import com.fineapple.Infrastructure.common.CommonCodeService;
+
+import com.fineapple.application.common.CommonCode;
+import com.fineapple.application.common.CommonCodeService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
