@@ -1,4 +1,4 @@
-
+# .github/workflows/main-cicd.yml
 
 name: Main CI/CD Pipeline
 
@@ -8,9 +8,6 @@ on:
       - main
 
 jobs:
-  # =======================================================
-  # 1. 빌드 및 도커 이미지 푸시 (Build & Push Docker Image)
-  # =======================================================
   build:
     runs-on: ubuntu-latest
 
@@ -24,24 +21,21 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      # Spring Boot JAR 파일 생성
       - name: Build Spring Boot JAR
         run: |
-          cd FineApple
+          cd FineApple # 실제 스프링 프로젝트 폴더 이름으로 수정
           ./mvnw clean package -DskipTests
           cd ..
 
-      # Docker Hub에 로그인
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # Docker 이미지 빌드 및 푸시
       - name: Build and push Docker images
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/fineapple-spring-dev ./FineApple
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/fineapple-spring-dev ./FineApple # 실제 스프링 프로젝트 폴더 이름으로 수정
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/fineapple-fastapi-dev ./fastapi-server
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/fineapple-batch-dev ./batch
 
@@ -49,11 +43,7 @@ jobs:
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/fineapple-fastapi-dev
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/fineapple-batch-dev
 
-  # =======================================================
-  # 2. EC2 서버에 배포 (Deploy to EC2)
-  # =======================================================
   deploy:
-    # 'build' 작업이 성공해야만 'deploy' 작업을 실행
     needs: build
     runs-on: ubuntu-latest
 
@@ -65,16 +55,23 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            # EC2 인스턴스에서 실행할 명령어
+            echo "--- Navigating to project directory ---"
             cd ~/fineapple-service
             
-            # ▼▼▼ 여기가 수정된 부분입니다! ▼▼▼
-            # Docker Hub에서 최신 이미지를 받아옴
+            echo "--- Pulling latest images from Docker Hub ---"
             docker compose pull
             
-            # 컨테이너를 내렸다가 최신 이미지로 다시 실행
+            echo "--- Shutting down existing containers ---"
             docker compose down
+            
+            echo "--- Starting new containers in detached mode ---"
             docker compose up -d
             
-            # 사용하지 않는 이전 도커 이미지를 정리
-            docker image prune -f
+            echo "--- Waiting for containers to stabilize (10 seconds) ---"
+            sleep 10
+            
+            echo "--- Current status of all containers ---"
+            docker compose ps -a
+            
+            echo "--- Displaying last 50 lines of logs ---"
+            docker compose logs --tail=50
