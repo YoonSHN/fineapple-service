@@ -10,4 +10,4 @@ DB_PASSWORD = os.getenv("DB_PASSWORD")
 DB_NAME = os.getenv("DB_NAME")
 
 # els
-ES_HOST = os.getenv("ES_HOST")
+ES_HOST = os.getenv("ELASTICSEARCH_HOSTS")

@@ -44,6 +44,11 @@ services:
       - backend-net
     volumes:
       - mysql_main_data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   fastapi:
     build: ./fastapi-server
@@ -57,6 +62,13 @@ services:
       - mysql-main
     environment:
       HOSTNAME: fastapi-server
+      UPSTAGE_API_KEY: ${UPSTAGE_API_KEY}
+      DATABASE_URL: ${DATABASE_URL}
+      ELASTICSEARCH_HOSTS: ${ES_HOST}
+      DB_HOST: ${DB_HOST}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
     volumes:
       - ./fastapi-server:/app
 
@@ -67,11 +79,17 @@ services:
     networks:
       - backend-net
     depends_on:
-      - fastapi
-      - mysql-main
+      fastapi:
+        condition: service_started
+      mysql-main:
+          condition: service_healthy
     restart: "no"
     environment:
       HOSTNAME: batch-job
+      DB_HOST: ${DB_HOST}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
     volumes:
       - ./batch:/app
 
@@ -97,6 +115,8 @@ services:
     networks:
       - frontend-net
       - backend-net
+    depends_on: # <-- 이 부분을 추가하세요
+      - fastapi
     environment:
       HOSTNAME: nginx-server
 
@@ -122,6 +142,7 @@ services:
     image: docker.elastic.co/beats/filebeat:8.12.1
     container_name: filebeat-dev
     user: root
+    command: filebeat -e -strict.perms=false
     volumes:
       - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
