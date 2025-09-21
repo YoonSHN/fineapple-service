@@ -68,12 +68,13 @@ jobs:
             # EC2 인스턴스에서 실행할 명령어
             cd ~/fineapple-service
             
+            # ▼▼▼ 여기가 수정된 부분입니다! ▼▼▼
             # Docker Hub에서 최신 이미지를 받아옴
-            docker-compose pull
+            docker compose pull
             
             # 컨테이너를 내렸다가 최신 이미지로 다시 실행
-            docker-compose down
-            docker-compose up -d
+            docker compose down
+            docker compose up -d
             
             # 사용하지 않는 이전 도커 이미지를 정리
             docker image prune -f
